@@ -1,0 +1,37 @@
+@{
+    ViewData["Title"] = "Lär dig tigrinja";
+    var signedIn = User.Identity?.IsAuthenticated == true;
+}
+<section class="learning-hero culture-hero discovery-hero">
+    <div class="hero-copy">
+        <h1>Lär dig tala tigrinja</h1>
+        <p class="hero-description">Från ett första <span lang="ti-Latn">selam</span> till ett vardagssamtal. Lär dig uttrycken, skriv egna svar och öva i din takt.</p>
+        <div class="d-flex flex-wrap gap-2">
+            @if (signedIn)
+            {
+                <a class="btn btn-primary" asp-controller="Learn" asp-action="Index">Fortsätt lära</a>
+                <a class="btn btn-outline-primary" asp-controller="Courses" asp-action="Index">Utforska kurser</a>
+            }
+            else
+            {
+                <a class="btn btn-primary" asp-controller="Courses" asp-action="Index">Utforska kurser</a>
+            }
+        </div>
+    </div>
+    <a class="tense-spotlight" asp-controller="Tenses" asp-action="Index">
+        <span class="spotlight-category">Tidsformer</span>
+        <h2>Nutid, dåtid och framtid</h2>
+        <p>Jag äter. Jag åt. Jag ska äta.</p>
+        <span class="spotlight-action">Jämför formerna <span aria-hidden="true">→</span></span>
+        <img src="~/images/jebena.svg" asp-append-version="true" alt="" width="62" height="76" />
+    </a>
+</section>
+<section class="discovery-section" aria-labelledby="practice-heading">
+    <h2 id="practice-heading">Vad vill du öva på?</h2>
+    @if (!signedIn) { <p>Logga in för att använda de här övningarna.</p> }
+    <div class="practice-links">
+        <a asp-controller="FirstMeeting" asp-action="Index"><strong>Skriv en dialog</strong><span>Hälsa och presentera dig i ett första möte.</span></a>
+        <a asp-controller="DailyTraining" asp-action="Index"><strong>Dagens träning</strong><span>Plocka upp orden du behöver repetera.</span></a>
+        <a asp-controller="Games" asp-action="Index"><strong>Spel och övningar</strong><span>Para ihop uttryck och träna minnet.</span></a>
+    </div>
+</section>

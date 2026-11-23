@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 48" fill="none">
+  <!-- Fritt formgiven geometrisk bård, inte en kopia av ett specifikt kulturföremål. -->
+  <path d="M0 24H28M68 24H96M48 8L64 24L48 40L32 24Z" stroke="#b68b61" stroke-width="1.4"/>
+  <path d="M48 16L56 24L48 32L40 24Z" stroke="#80907b" stroke-width="1.2"/>
+  <path d="M0 4H96M0 44H96" stroke="#d1b693" stroke-width=".8"/>
+  <circle cx="16" cy="24" r="2" fill="#b68b61"/>
+  <circle cx="80" cy="24" r="2" fill="#b68b61"/>
+</svg>

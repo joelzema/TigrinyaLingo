@@ -1,0 +1,40 @@
+@model ConversationsHomeViewModel
+@{ ViewData["Title"] = "Vardagssamtal"; }
+@section Styles { <link rel="stylesheet" href="~/css/conversations.css" asp-append-version="true" /> }
+<div class="conversation-shell">
+    <a class="conversation-back" asp-controller="Learn" asp-action="Index">← Min lärväg</a>
+    <header class="conversation-header">
+        <p class="learning-eyebrow">Sätt orden i sammanhang</p>
+        <h1>Vardagssamtal</h1>
+        <p>En vän säger något. Du väljer ett svar på tigrinja och ser direkt hur det passar i samtalet.</p>
+    </header>
+    <article class="conversation-scene mb-3"><h2>Ett första möte</h2><p>Hälsa, fråga hur hon mår och presentera dig. Skriv själv eller ta hjälp av en ledtråd.</p><a class="btn btn-primary" asp-controller="FirstMeeting" asp-action="Index">Skriv dialogen</a></article>
+    <p class="conversation-note">I flervalsövningarna nedan visas replikerna med svenskt lässtöd. Du svarar med uttryck från lektioner du har klarat. Varje samtal har fyra repliker och spelas i din egen takt.</p>
+    @if (Model.Message is not null)
+    {
+        <p class="alert alert-info" role="status">@Model.Message</p>
+    }
+    <div class="conversation-scenes">
+        @foreach (var scene in Model.Scenes)
+        {
+            <article class="conversation-scene @(scene.IsReady ? "scene-ready" : "scene-locked")">
+                <span class="conversation-symbol" aria-hidden="true">•••</span>
+                <p class="learning-eyebrow">@(scene.IsReady ? "Redo att öva" : scene.LessonCompleted ? "Behöver granskas" : "Låses upp efter lektionen")</p>
+                <h2>@scene.Title</h2>
+                <p>@scene.Description</p>
+                <p class="small text-muted">@scene.TurnCount repliker · @scene.LessonTitle</p>
+                @if (scene.IsReady)
+                {
+                    <a class="btn btn-primary" asp-action="Play" asp-route-id="@scene.Id">Starta samtalet<span class="visually-hidden">: @scene.Title</span></a>
+                }
+                else
+                {
+                    <p class="small">@scene.Message</p>
+                    <a class="btn btn-outline-primary" asp-controller="Learn" asp-action="Index">Visa min lärväg<span class="visually-hidden"> för @scene.LessonTitle</span></a>
+                }
+            </article>
+        }
+    </div>
+    <p class="conversation-note">Rätt svar ger samtalspoäng. När du avslutar sparas vilka uttryck du behöver repetera. Lektionsresultat, XP och lektionslås ändras inte.</p>
+    <a class="btn btn-outline-primary" asp-controller="Games" asp-action="Index">Fler sätt att träna</a>
+</div>

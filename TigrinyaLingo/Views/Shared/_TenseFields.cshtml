@@ -1,0 +1,11 @@
+@model TenseFieldsInput
+<details class="learning-card mb-4" open="@(!string.IsNullOrWhiteSpace(Model.TenseGroup))">
+    <summary class="fw-semibold">Tidsformer – valfria lärandeuppgifter</summary>
+    <p class="form-text mt-3">Använd samma gruppnamn för samma verb och person, till exempel Äta – jag. En komplett grupp har en granskad fras för nutid, en för dåtid och en för framtid. Lägg varje form som en egen fras.</p>
+    <div class="mb-3"><label asp-for="TenseGroup" class="form-label"></label><input asp-for="TenseGroup" class="form-control" maxlength="80" /><span asp-validation-for="TenseGroup" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="TimeReference" class="form-label"></label><select asp-for="TimeReference" class="form-select"><option value="0">Ingen tidsform angiven</option><option value="1">Nutid – nu eller återkommande</option><option value="2">Dåtid – tidigare</option><option value="3">Framtid – senare</option></select><span asp-validation-for="TimeReference" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="TenseContext" class="form-label"></label><textarea asp-for="TenseContext" class="form-control" rows="3" maxlength="500" placeholder="Beskriv situationen där just den här formen passar."></textarea><span asp-validation-for="TenseContext" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="TenseNotes" class="form-label"></label><textarea asp-for="TenseNotes" class="form-control" rows="3" maxlength="500"></textarea><span asp-validation-for="TenseNotes" class="text-danger"></span></div>
+    <div class="form-check"><input asp-for="TenseReviewed" class="form-check-input" /><label asp-for="TenseReviewed" class="form-check-label"></label></div>
+    <p class="form-text">Markera först när form, svensk betydelse och sammanhang har kontrollerats av en kunnig tigrinjatalare eller mot dokumenterat språkunderlag. Dokumentera underlaget i språknoteringen. Kontrollera igen efter ändringar. Ogranskade tidsformsfraser döljs i lärandet och pausar lektionens quiz tills de är granskade. Vanliga fraser utan tidsformsuppgifter påverkas inte.</p>
+</details>

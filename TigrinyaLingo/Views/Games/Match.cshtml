@@ -1,0 +1,24 @@
+@model MatchGameViewModel
+@using System.Text.Json
+@{ var memory = Model.Mode == MatchGameMode.Memory; ViewData["Title"] = memory ? "Memory" : "Para ihop"; }
+@section Styles { <link rel="stylesheet" href="~/css/games.css" asp-append-version="true" /> }
+<section class="games-shell">
+<a class="game-back" asp-action="Index">← Alla spel</a>
+<header class="games-intro"><p class="learning-eyebrow">@(memory ? "Vänd · minns · matcha" : "Se · koppla · lär")</p><h1>@ViewData["Title"]</h1><p>@(memory ? "Vänd ett kort i varje kolumn och hitta samma betydelse. Ingen tidspress." : "Välj ett svenskt uttryck och dess motsvarighet på tigrinja. Ingen tidspress.")</p></header>
+@if (!Model.IsAvailable) {
+<div class="learning-card"><h2 class="h4">Snart kan du spela!</h2><p>Gör först ett lektionsquiz med minst två olika uttryck, så hämtar vi dina ord till spelet.</p><a class="btn btn-primary" asp-controller="Courses" asp-action="Index">Börja lära dig</a></div>
+} else {
+<p id="game-fallback">Spelet behöver JavaScript. Du kan också <a asp-controller="Courses" asp-action="Index">träna i kurserna</a>.</p>
+<partial name="_AudienceExplanation" />
+<div id="match-game" hidden data-check-url="@Url.Action("CheckPair")">
+<div class="game-stats"><span><strong id="game-points">0</strong> spelpoäng</span><span id="game-round"></span><span id="game-streak">0 i följd</span></div>
+<progress id="game-progress" max="@Model.PairCount" value="0" aria-label="Matchade par"></progress>
+<p class="game-count" id="game-count">0 av @Model.PairCount par</p>
+<div class="game-board"><section aria-labelledby="swedish-heading"><h2 id="swedish-heading">Svenska</h2><div id="swedish-cards" class="game-column"></div></section><section aria-labelledby="tigrinya-heading"><h2 id="tigrinya-heading">Tigrinja</h2><div id="tigrinya-cards" class="game-column"></div></section></div>
+<div class="game-feedback"><p id="game-status" role="status" aria-live="polite">@(memory ? "Vänd ett kort i varje kolumn." : "Vilka uttryck hör ihop?")</p><button type="button" id="game-next" class="btn btn-primary" hidden>Fortsätt</button></div>
+</div>
+<form asp-action="Finish" method="post" id="game-finish"><input type="hidden" name="SessionToken" value="@Model.SessionToken" /></form>
+<script type="application/json" id="match-game-board">@Html.Raw(JsonSerializer.Serialize(Model.Board))</script>
+}
+</section>
+@section Scripts { @if (Model.IsAvailable) { <script src="~/js/match-game.js" asp-append-version="true"></script> } }

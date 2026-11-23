@@ -1,0 +1,19 @@
+@using Domain.Entities
+@model LearningPreferenceInput
+@{ ViewData["Title"] = "Din startpunkt"; }
+<div class="preference-shell">
+    <header class="learning-header"><p class="learning-eyebrow">En lärväg som passar dig</p><h1>Hur mycket tigrinja kan du redan?</h1><p>Välj det som känns närmast. Vi föreslår en startpunkt, och du kan alltid välja en annan lektion.</p></header>
+    <p class="placement-entry">Osäker på din startpunkt? <a asp-controller="Placement" asp-action="Index">Prova ett frivilligt nivåtest med nio frågor →</a></p>
+    <form asp-action="Index" asp-route-returnUrl="" method="post">
+        <input asp-for="ReturnUrl" type="hidden" />
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <fieldset class="preference-options"><legend class="visually-hidden">Dina förkunskaper</legend>
+            <label class="preference-option"><input asp-for="Experience" type="radio" id="experience-beginner" value="@LearningExperience.Beginner" /><span><strong>Jag är nybörjare</strong><span>Jag vill börja med hälsningar och enkla vardagsuttryck.</span><small>Rekommenderad start: Dina första hälsningar.</small></span></label>
+            <label class="preference-option"><input asp-for="Experience" type="radio" id="experience-some" value="@LearningExperience.SomeUnderstanding" /><span><strong>Jag har en grundförståelse</strong><span>Jag känner igen enkla ord och vill kunna säga mer själv.</span><small>Rekommenderad start: Småprata och lära känna.</small></span></label>
+            <label class="preference-option"><input asp-for="Experience" type="radio" id="experience-familiar" value="@LearningExperience.Familiar" /><span><strong>Jag kan redan en del</strong><span>Jag förstår en del vardagligt tal och vill bygga vidare på uttryck och tidsformer.</span><small>Rekommenderad start: Fråga om språk.</small></span></label>
+        </fieldset>
+        <p class="preference-note">Alla färdiga lektionsquiz är öppna för dig. Valet ger inga XP och markerar inga lektioner som klara. Det är en självskattning, inte ett nivåtest. Du kan ändra valet under <strong>Fortsätt lära</strong>.</p>
+        <button class="btn btn-primary btn-lg" type="submit">Spara och fortsätt</button>
+    </form>
+</div>
+

@@ -1,0 +1,12 @@
+@model AudioPlayerViewModel
+<div class="word-audio" data-word-audio>
+    <audio controls preload="none" aria-label="Uttal av @Model.Label">
+        <source src="@Url.Content("~/audio/tigrinya/" + Model.AudioFileName)" type="audio/mpeg" />
+        Din webbläsare stöder inte ljuduppspelning.
+    </audio>
+    <div class="audio-actions" hidden>
+        <button class="btn btn-primary btn-sm" type="button" data-audio-rate="1" aria-label="Lyssna på @Model.Label">Lyssna</button>
+        <button class="btn btn-outline-primary btn-sm" type="button" data-audio-rate="0.8" aria-label="Lyssna långsamt på @Model.Label">Långsamt</button>
+    </div>
+    <p class="audio-status small text-muted" data-audio-status role="status" aria-live="polite"></p>
+</div>

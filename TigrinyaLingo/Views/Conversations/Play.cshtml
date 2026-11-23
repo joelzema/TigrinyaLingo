@@ -1,0 +1,53 @@
+@model ConversationPlayViewModel
+@using System.Text.Json
+@{ ViewData["Title"] = Model.Scene.Title; }
+@section Styles { <link rel="stylesheet" href="~/css/conversations.css" asp-append-version="true" /> }
+<div class="conversation-shell">
+    <a class="conversation-back" asp-action="Index">@(Model.IsAddressPractice ? "← Tilltalsträning" : Model.IsTensePractice ? "← Tidsformer" : "← Alla vardagssamtal")</a>
+    <header class="conversation-header">
+        <p class="learning-eyebrow">@(Model.IsAddressPractice ? "Tilltalsträning" : Model.IsTensePractice ? "Tidsformer" : "Vardagssamtal")</p>
+        <h1>@Model.Scene.Title</h1>
+        <p>@Model.Scene.Description</p>
+    </header>
+    @if (!Model.Scene.IsReady)
+    {
+        <section class="learning-card">
+            <h2 class="h4">@(Model.Scene.LessonCompleted ? "Samtalet behöver granskas" : "Gör klart lektionen först")</h2>
+            <p>@Model.Scene.Message</p>
+            <p>Lektion: <strong>@Model.Scene.LessonTitle</strong></p>
+            <a class="btn btn-primary" asp-controller="Learn" asp-action="Index">Till min lärväg</a>
+        </section>
+    }
+    else
+    {
+        <p id="conversation-fallback">Träningen behöver JavaScript. Du kan också <a asp-controller="Learn" asp-action="Index">öva i lektionerna</a>.</p>
+        @if (!Model.IsTensePractice) { <partial name="_AudienceExplanation" /> }
+<div id="conversation-game" data-check-url="@Url.Action("CheckAnswer")" data-partner-label="@(Model.IsTensePractice ? "Situation · svenskt lässtöd" : "Din samtalspartner · svenskt lässtöd")" data-step-label="@(Model.IsPractice ? "Situation" : "Replik")" data-points-label="@(Model.IsPractice ? "träningspoäng" : "samtalspoäng")" hidden>
+            <div class="conversation-meter">
+                <div><span id="conversation-step">@(Model.IsPractice ? "Situation" : "Replik") 1 av @Model.Scene.TurnCount</span><strong id="conversation-points">0 @(Model.IsPractice ? "träningspoäng" : "samtalspoäng")</strong></div>
+                <progress id="conversation-progress" value="0" max="@Model.Scene.TurnCount" aria-label="@(Model.IsPractice ? "Besvarade situationer" : "Besvarade repliker")"></progress>
+            </div>
+            <p class="conversation-support">@(Model.IsTensePractice ? "Situationen visas på svenska som lässtöd. Välj den form som passar." : "Din samtalspartners replik visas på svenska som lässtöd. Välj ditt svar på tigrinja.")</p>
+            @if (Model.IsAddressPractice) { <p class="small text-muted">Välj form efter personen du pratar med. Efter svaret får du jämföra båda formerna.</p> }
+            <div id="conversation-log" class="conversation-log" aria-label="@(Model.IsPractice ? "Träningens situationer" : "Samtalets repliker")"></div>
+            <section class="conversation-answer-area" aria-labelledby="conversation-question">
+                <h2 id="conversation-question" class="h5">Hur svarar du?</h2>
+                <p class="small text-muted">Välj ett alternativ. Du kan också använda tangenterna 1–4.</p>
+                <div id="conversation-choices" class="conversation-choices"></div>
+                <div id="conversation-feedback" class="conversation-feedback" role="status" aria-live="polite"></div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" id="conversation-check" class="btn btn-primary" disabled>Kontrollera svaret</button>
+                    <button type="button" id="conversation-next" class="btn btn-primary" hidden>Nästa replik</button>
+                </div>
+            </section>
+        </div>
+        <form asp-action="Finish" method="post" id="conversation-finish"><input type="hidden" name="SessionToken" value="@Model.SessionToken" /></form>
+        <script type="application/json" id="conversation-board">@Html.Raw(JsonSerializer.Serialize(Model.Board))</script>
+    }
+</div>
+@section Scripts {
+    @if (Model.Scene.IsReady)
+    {
+        <script src="~/js/conversations.js" asp-append-version="true"></script>
+    }
+}

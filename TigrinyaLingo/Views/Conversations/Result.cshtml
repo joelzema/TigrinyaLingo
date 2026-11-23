@@ -1,0 +1,42 @@
+@model ConversationResultViewModel
+@{ ViewData["Title"] = Model.IsAddressPractice ? "Tilltalsträningen är klar" : Model.IsTensePractice ? "Tidsformsträningen är klar" : "Samtalet är klart"; }
+@section Styles { <link rel="stylesheet" href="~/css/conversations.css" asp-append-version="true" /> }
+<div class="conversation-shell conversation-result">
+    <p class="learning-eyebrow">@Model.Title · omgång klar</p>
+    <div class="conversation-stars" aria-label="@Model.Stars av 3 stjärnor">@(new string('★', Model.Stars))@(new string('☆', 3 - Model.Stars))</div>
+    <h1>@(Model.IsAddressPractice ? "Bra jobbat med tilltalet!" : Model.IsTensePractice ? "Bra jobbat med tidsformerna!" : "Bra samtalsträning!")</h1>
+    <p>Du valde rätt svar i <strong>@Model.CorrectCount av @Model.TotalCount</strong> situationer.</p>
+    <p class="conversation-score">@Model.Points <span>@(Model.IsPractice ? "träningspoäng" : "samtalspoäng")</span></p>
+    @if (Model.Outdated)
+    {
+        <p class="alert alert-info">Fraser eller repetitionssvar ändrades medan du tränade. Din nyare repetition har behållits och omgången skrev inte över den.</p>
+    }
+    else if (Model.ReviewSaved)
+    {
+        <p>Din repetition är uppdaterad. @(Model.CorrectCount == Model.TotalCount ? "Alla svar passade i situationerna!" : "Missade uttryck finns kvar att öva på.")</p>
+    }
+    <p class="small text-muted">Poängen gäller den här omgången. Lektionsresultat, XP och upplåsningar är oförändrade.</p>
+    <div class="conversation-result-actions">
+        <a class="btn btn-primary" asp-action="Play" asp-route-id="@(Model.IsAddressPractice ? null : Model.SceneId)">@(Model.IsAddressPractice ? "Öva tilltalet igen" : Model.IsTensePractice ? "Öva tidsformerna igen" : "Träna samtalet igen")</a>
+        <a class="btn btn-outline-primary" asp-action="Index">@(Model.IsAddressPractice ? "Till tilltalsträningen" : Model.IsTensePractice ? "Till tidsformerna" : "Välj ett annat samtal")</a>
+        <a class="btn btn-outline-primary" asp-controller="DailyTraining" asp-action="Index">Repetera mina uttryck</a>
+    </div>
+    <details class="conversation-review">
+        <summary>Se dina @Model.TotalCount svar</summary>
+        @foreach (var turn in Model.Turns)
+        {
+            <article class="conversation-result-turn">
+                <p class="small text-muted">@turn.Situation</p>
+                <p class="conversation-quote">”@turn.PartnerLine”</p>
+                <p class="@(turn.IsCorrect ? "progress-completed" : "text-danger")">@(turn.IsCorrect ? "Passande svar" : "Ditt svar"): <strong lang="ti-Latn">@turn.Answer</strong> <span class="phrase-choice-label">@turn.AnswerUsageLabel</span></p>
+                @if (!turn.IsCorrect)
+                {
+                    <p>Passar bättre här: <strong lang="ti-Latn">@turn.CorrectText</strong></p>
+                }
+                <partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(turn.CorrectText, turn.Audience, true))" />
+                <p class="small mb-0">Betydelse: @turn.Meaning</p>
+                @if (turn.Explanation is not null) { <p class="mt-2">@turn.Explanation</p> }
+            </article>
+        }
+    </details>
+</div>

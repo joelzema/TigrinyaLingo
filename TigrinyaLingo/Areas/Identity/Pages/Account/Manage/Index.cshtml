@@ -1,0 +1,17 @@
+@page
+@model TigrinyaLingo.Areas.Identity.Pages.Account.Manage.ProfileModel
+@{ ViewData["Title"] = "Min profil"; ViewData["ActivePage"] = "Index"; }
+<h1 class="h3">Min profil</h1>
+@if (Model.Saved) { <p class="alert alert-success" role="status">Profilen är sparad.</p> }
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3"><label asp-for="Input.DisplayName"></label>
+        <input asp-for="Input.DisplayName" class="form-control" autocomplete="nickname" maxlength="30" />
+        <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
+    </div>
+    <div class="mb-3"><label asp-for="Input.PhoneNumber"></label>
+        <input asp-for="Input.PhoneNumber" class="form-control" autocomplete="tel" />
+        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+    </div>
+    <button class="btn btn-primary">Spara profil</button>
+</form>

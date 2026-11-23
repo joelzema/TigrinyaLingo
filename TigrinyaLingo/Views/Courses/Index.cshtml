@@ -1,0 +1,36 @@
+@model IReadOnlyList<CourseListItemViewModel>
+@{ ViewData["Title"] = "Kurser"; }
+
+<header class="learning-header">
+    <p class="learning-eyebrow">Ett ord i taget</p>
+    <h1>Välj din kurs</h1>
+    <p class="text-muted">Utforska lektionerna och börja lära dig tigrinja i din egen takt.</p>
+</header>
+@if (Model.Count == 0)
+{
+    <div class="learning-empty"><h2 class="h4">Inga kurser ännu</h2><p>Det finns inga kurser att visa just nu.</p></div>
+}
+else
+{
+    <div class="row g-4">
+    @foreach (var course in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <article class="learning-card h-100">
+                <span class="learning-tag">@course.Category</span>
+                <h2 class="h4 mt-3">@course.Title</h2>
+                <p class="text-muted">@course.Description</p>
+                <p class="small">@course.LessonCount @(course.LessonCount == 1 ? "lektion" : "lektioner")</p>
+                <a class="btn btn-primary" asp-action="Details" asp-route-id="@course.Id">Visa lektioner<span class="visually-hidden"> i @course.Title</span></a>
+            </article>
+        </div>
+    }
+    </div>
+}
+
+<section class="learning-card mt-4">
+    <p class="learning-eyebrow">Grammatikmodul</p>
+    <h2 class="h4">Nutid, dåtid och framtid</h2>
+    <p>Jämför hur du berättar vad du gör nu, vad du gjorde tidigare och vad du ska göra senare.</p>
+    <a class="btn btn-outline-primary" asp-controller="Tenses" asp-action="Index">Utforska tidsformer</a>
+</section>

@@ -1,0 +1,12 @@
+@model PhraseUsageDisplay
+@{ var usage = PhraseUsageGuide.For(Model.LatinText, Model.Audience); }
+@if (usage is not null)
+{
+    <div class="phrase-usage" lang="sv">
+        <span class="phrase-usage-label">@usage.Label</span>
+        @if (Model.ShowOtherForm && usage.OtherForm is not null)
+        {
+            <p class="phrase-other-form">@usage.OtherLabel: <strong lang="ti-Latn">@usage.OtherForm</strong></p>
+        }
+    </div>
+}

@@ -1,0 +1,25 @@
+@model GamesHomeViewModel
+@{ ViewData["Title"] = "Träna"; }
+@section Styles { <link rel="stylesheet" href="~/css/games.css" asp-append-version="true" /> }
+<section class="games-shell">
+<header class="games-intro"><h1>Träna</h1><p>Repetera ord, skriv en dialog eller spela en kort runda.</p></header>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><article class="learning-card h-100"><h2 class="h4">Nutid, dåtid och framtid</h2><p>Tidsformer i vardagen. Läs en situation och välj eller skriv rätt uttryck.</p><a class="btn btn-outline-primary" asp-controller="Tenses" asp-action="Index">Välj tidsformsövning</a></article></div>
+    <div class="col-md-4"><article class="learning-card h-100"><h2 class="h4">Dagens träning</h2><p>Repetera uttryck från dina lektioner.</p><a class="btn btn-primary" asp-controller="DailyTraining" asp-action="Index">Till dagens träning</a></article></div>
+    <div class="col-md-4"><article class="learning-card h-100"><h2 class="h4">Skriv en dialog</h2><p>Hälsa och presentera dig i ett första möte.</p><a class="btn btn-outline-primary" asp-controller="FirstMeeting" asp-action="Index">Starta skrivdialogen</a></article></div>
+</div>
+<h2 class="h3">Spel och situationsövningar</h2>
+@if (Model.Message is not null) { <p class="alert alert-info" role="status">@Model.Message</p> }
+@if (Model.KnownWordCount < 2) {
+<div class="learning-card mb-4"><h2 class="h4">Börja med en lektion</h2><p>Gör ett quiz med minst två olika uttryck så kan du spela med orden här.</p><a class="btn btn-primary" asp-controller="Courses" asp-action="Index">Till kurserna</a></div>
+}
+<div class="game-menu">
+<article class="game-choice"><span class="game-icon" aria-hidden="true">↔</span><p class="learning-eyebrow">Koppla ord till betydelse</p><h2>Para ihop</h2><p>Se alla uttryck och hitta deras svenska betydelser. Flera rätt i följd ger kombobonus!</p><ul><li>Upp till tre korta rundor</li><li>Koppla uttryck till deras betydelse</li><li>Missade ord följer med till repetitionen</li></ul><a class="btn btn-primary" asp-action="Match">Spela Para ihop</a></article>
+<article class="game-choice memory-choice"><span class="game-icon" aria-hidden="true">▦</span><p class="learning-eyebrow">Träna minnet och språket</p><h2>Memory</h2><p>Vänd ett svenskt kort och ett tigrinjakort. Kom ihåg var orden finns och hitta alla par.</p><ul><li>Vänd kort i din egen takt</li><li>Samla spelpoäng och stjärnor</li><li>Spela utan att ändra repetitionslistan</li></ul><a class="btn btn-primary" asp-action="Match" asp-route-mode="Memory">Spela Memory</a></article>
+<article class="game-choice conversation-choice"><span class="game-icon" aria-hidden="true">•••</span><p class="learning-eyebrow">Sätt orden i sammanhang</p><h2>Vardagssamtal</h2><p>En vän säger något. Välj ett passande svar på tigrinja i ett kort samtal med fyra repliker.</p><ul><li>Öppnas efter klarade lektioner</li><li>Direkt återkoppling på dina svar</li><li>Missade uttryck följer med till repetitionen</li></ul><a class="btn btn-primary" asp-controller="Conversations" asp-action="Index">Träna vardagssamtal</a></article>
+<article class="game-choice"><span class="game-icon" aria-hidden="true">↔</span><p class="learning-eyebrow">Vem pratar du med?</p><h2>Välj rätt tilltal</h2><p>Fråga en man eller kvinna. Välj rätt tigrinjaform och lär dig varför den passar.</p><ul><li>Båda formerna i korta situationer</li><li>Fyra svarsalternativ</li><li>Förklaring och repetition av missade former</li></ul><a class="btn btn-primary" asp-controller="AddressPractice" asp-action="Index">Träna tilltal</a></article>
+
+</div>
+<p class="game-footnote">Spelen använder ord från lektioner du gjort quiz på. Spelpoängen gäller din omgång; lektionsresultat och XP sparas som vanligt i kurserna.</p>
+
+</section>

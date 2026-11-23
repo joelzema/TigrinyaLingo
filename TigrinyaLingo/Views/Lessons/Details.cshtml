@@ -1,0 +1,113 @@
+@model LessonDetailsViewModel
+@{ ViewData["Title"] = Model.Title; var practice = LessonPracticeGuide.For(Model.Id); var hasAudio = Model.Words.Any(word => !string.IsNullOrWhiteSpace(word.AudioFileName)); }
+
+<nav aria-label="Brödsmulor"><ol class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-controller="Courses" asp-action="Index">Kurser</a></li>
+    <li class="breadcrumb-item"><a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId">@Model.CourseTitle</a></li>
+    <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+</ol></nav>
+<header class="learning-header">
+    <p class="learning-eyebrow">Lär · säg · repetera</p>
+    <h1>@Model.Title</h1>
+        @if (practice is not null)
+    {
+        <p class="text-muted">@practice.Goal</p>
+    }
+    @if (hasAudio)
+    {
+        <p class="text-muted">Lyssna och säg efter. Välj Långsamt om du vill höra frasen i lugnare takt.</p>
+    }
+    else if (Model.Words.Count > 0)
+    {
+        <p class="text-muted">Träna på betydelserna med ordkort och quiz. Den här lektionen har ännu inga uttalsinspelningar.</p>
+    }
+</header>
+@if (Model.IsQuizLocked)
+{
+    <section class="learning-card mb-4" aria-labelledby="lesson-prerequisite-title">
+        <p class="learning-eyebrow">Förhandsvisning · ordkort</p><h2 id="lesson-prerequisite-title" class="h4">Grunderna först</h2>
+        <p>Du kan läsa uttrycken här. Quizet låses upp när du har gjort klart @Model.RequiredLessonTitle med alla rätt.</p>
+        <a class="btn btn-primary" asp-controller="Lessons" asp-action="Details" asp-route-id="@Model.RequiredLessonId">Fortsätt med @Model.RequiredLessonTitle</a>
+        <a class="btn btn-outline-primary" asp-controller="Learn" asp-action="Index">Visa min lärväg</a>
+    </section>
+}
+@if (Model.Words.Count == 0)
+{
+    <div class="learning-empty"><h2 class="h4">Innehåll kommer snart</h2><p>Den här lektionen har inga ord att visa ännu.</p></div>
+}
+else
+{
+    @if (Model.Words.Any(word => PhraseUsageGuide.For(word.LatinText, word.Audience) is not null))
+    {
+        <partial name="_AudienceExplanation" />
+    }
+    <div class="row g-4">
+    @for (var index = 0; index < Model.Words.Count; index++)
+    {
+        var word = Model.Words[index];
+        <div class="col-sm-6 col-lg-3">
+            <article class="learning-card word-card h-100">
+                <p class="small text-muted">Uttryck @(index + 1) av @Model.Words.Count</p>
+                <h2 class="h4">@word.Meaning</h2>
+                @if (!string.IsNullOrWhiteSpace(word.LatinText))
+                {
+                    <p class="spoken-word" lang="ti-Latn">@word.LatinText</p>
+                @if (word.TenseHint is { } timeHint) { <partial name="_TenseHint" model="timeHint" /> }
+                    <partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(word.LatinText, word.Audience, true))" />
+                }
+                else
+                {
+                    <p class="text-muted">Latinsk skrivning kommer snart.</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(word.AudioFileName))
+                {
+                    <partial name="_WordAudio" model="@(new AudioPlayerViewModel { AudioFileName = word.AudioFileName, Label = word.LatinText })" />
+                }
+                else
+                {
+                    <p class="small text-muted">Uttalsinspelning läggs till senare.</p>
+                }
+            </article>
+        </div>
+    }
+    </div>
+    @if (practice is not null)
+    {
+        <details class="learning-card mt-4">
+            <summary>Tips för den här lektionen</summary>
+            <p class="mt-3 mb-0">@practice.Context</p>
+        </details>
+        <section class="learning-card mt-4" aria-labelledby="speaking-practice-title">
+            <p class="learning-eyebrow">Din tur att prata</p>
+            <h2 class="h4" id="speaking-practice-title">Använd orden i en situation</h2>
+            <p class="mb-0">@practice.Challenge</p>
+        </section>
+    }
+    @if (Model.Id == 2 && practice is null)
+    {
+        <details class="learning-card mt-4">
+            <summary>Tips för presentationsfraserna</summary>
+            <p>I <span lang="ti-Latn">simey … yebehal</span> ersätter du punkterna med ditt namn. Om du heter Sara säger du <strong lang="ti-Latn">simey Sara yebehal</strong>. Punkterna är en plats att fylla i, inget du säger högt.</p>
+            <p><span lang="ti-Latn">Menyu shimka</span> används när du frågar en man vad han heter. <span lang="ti-Latn">Menyu shimki</span> används när du frågar en kvinna. Det är personen du talar <strong>till</strong> som avgör formen.</p>
+            <p class="mb-0">I <span lang="ti-Latn">ane kab … metsiye</span> fyller du i platsen du kommer från. Lyssna på frasens melodi och prova sedan med din egen plats.</p>
+        </details>
+    }
+    <p class="text-muted mt-4">Tips: läs betydelsen, täck över uttrycket och försök minnas det. Kom tillbaka en annan dag och repetera.</p>
+<section class="learning-card mt-4">
+        <h2 class="h4">Lär och öva i samma lektion</h2>
+        <p>När du är inloggad lär du dig ett uttryck och övar direkt i samma flöde. Ditt bästa resultat och XP sparas när lektionen är klar.</p>
+        @if (Model.IsQuizLocked)
+        {
+            <p class="mb-0">Gör först klart @Model.RequiredLessonTitle. Din ordinarie lärväg visar vilka quiz som är öppna.</p>
+        }
+        else if (User.Identity?.IsAuthenticated == true)
+        {
+            <a class="btn btn-primary" asp-controller="Quiz" asp-action="Index" asp-route-id="@Model.Id">Starta quiz</a>
+        }
+        else
+        {
+            <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Index", "Quiz", new { id = Model.Id })">Logga in och börja lektionen</a>
+        }
+    </section>
+}
+<a class="btn btn-outline-primary mt-3" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId">Tillbaka till lektionerna</a>

@@ -1,0 +1,36 @@
+@model TenseWritingTurn
+@{ ViewData["Title"] = Model.Title + " – skriv i tre tidsformer"; }
+<div class="preference-shell">
+    <a asp-action="Index">← Alla tidsformer</a>
+    <header class="learning-header"><p class="learning-eyebrow">Skriv i tre tidsformer</p><h1>@Model.Title</h1></header>
+    <section class="learning-card">
+        <p>Situation @Model.Step av 3</p>
+        <h2 class="h4">@Model.Context</h2>
+        @if (Model.Feedback != null) { <p role="status" class="alert @(Model.Correct ? "alert-success" : "alert-info")">@Model.Feedback</p> }
+        @if (Model.Correct)
+        {
+            <p><strong lang="ti-Latn">@Model.Phrase</strong> · @Model.Meaning</p>
+            @if (Model.Step < 3)
+            {
+                <a class="btn btn-primary" asp-action="Write" asp-route-id="@Model.GroupId" asp-route-step="@(Model.Step + 1)">Nästa situation</a>
+            }
+            else
+            {
+                <p>Du har använt samma verb i dåtid, nutid och framtid.</p>
+                <a class="btn btn-primary" asp-action="Index">Välj ett annat verb</a>
+            }
+        }
+        else
+        {
+            <form asp-action="CheckWriting" asp-route-id="@Model.GroupId" method="post">
+                <input type="hidden" name="step" value="@Model.Step" />
+                <label for="tense-answer">Svara på tigrinja</label>
+                <input id="tense-answer" name="answer" value="@Model.Attempt" class="form-control mb-3" required maxlength="500" autocomplete="off" spellcheck="false" />
+                <button class="btn btn-primary">Kolla svaret</button>
+            </form>
+            <details class="mt-3"><summary>Visa ledtråd</summary><p>@Model.Label · @Model.Meaning</p>
+                <details><summary>Visa kursens uttryck</summary><p lang="ti-Latn">@Model.Phrase</p></details>
+            </details>
+        }
+    </section>
+</div>

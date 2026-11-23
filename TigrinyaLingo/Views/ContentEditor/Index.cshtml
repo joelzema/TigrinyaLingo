@@ -1,0 +1,51 @@
+@model ContentEditorIndexViewModel
+@{ ViewData["Title"] = "Redigera fraser"; }
+<header class="learning-header">
+    <p class="learning-eyebrow">Din lokala innehållsverkstad</p>
+    <h1>Redigera ord och fraser</h1>
+    <p class="text-muted">Ändra ett uttryck och klicka på Spara. Uppdateringen visas i lektioner och träning när de öppnas på nytt.</p>
+</header>
+<section class="learning-card mb-4">
+    <form method="get" class="row g-3 align-items-end" role="search">
+        <div class="col-sm-8">
+            <label for="phrase-search" class="form-label">Sök efter tigrinja, svenska eller en lektion</label>
+            <input type="search" name="search" id="phrase-search" value="@Model.Search" maxlength="100" class="form-control" />
+        </div>
+        <div class="col-sm-4 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Sök</button>
+            @if (Model.Search.Length > 0) { <a class="btn btn-outline-primary" asp-action="Index">Visa alla</a> }
+        </div>
+    </form>
+</section>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <p class="mb-0 text-muted">@Model.Items.Count @(Model.Items.Count == 1 ? "uttryck" : "uttryck")</p>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary" asp-controller="PhraseCreation" asp-action="Index">Lägg till fras</a>
+        <a class="btn btn-outline-primary" asp-action="Export">Exportera fraser som JSON</a>
+    </div>
+</div>
+@if (Model.Items.Count == 0)
+{
+    <section class="learning-empty"><h2 class="h4">Inga matchande uttryck</h2><p class="mb-0">Prova att söka på en annan del av frasen eller visa alla lektioner.</p></section>
+}
+@foreach (var lesson in Model.Items.GroupBy(item => new { item.LessonId, item.LessonTitle }))
+{
+    <section class="mb-4" aria-labelledby="editor-lesson-@lesson.Key.LessonId">
+        <h2 class="h4" id="editor-lesson-@lesson.Key.LessonId">@lesson.Key.LessonTitle</h2>
+        <ul class="list-unstyled d-grid gap-3">
+        @foreach (var phrase in lesson)
+        {
+            <li class="learning-card d-flex flex-wrap gap-3 align-items-center">
+                <div class="flex-grow-1" style="min-width:0">
+                    <h3 class="h5 mb-1" lang="ti-Latn">@phrase.LatinText</h3>
+                    <p class="mb-1">@phrase.Meaning</p>
+                    @if (phrase.TenseGroup is not null) { <p class="small">@phrase.TenseGroup · @TenseGuide.Label(phrase.TimeReference) · @(phrase.TenseReviewed ? "Språkgranskad" : "Utkast – dolt i lärandet")</p> }
+                    <p class="small text-muted mb-0">@(phrase.HasAudio ? "Uttalsinspelning finns" : "Ingen uttalsinspelning")</p>
+                </div>
+                <a class="btn btn-primary" asp-action="Edit" asp-route-id="@phrase.Id">Redigera<span class="visually-hidden"> @phrase.LatinText</span></a>
+            </li>
+        }
+        </ul>
+    </section>
+}
+<p class="small text-muted mt-4">Exporten innehåller fraser, svarsalternativ och ljudfilnamn. Ljudfiler och personliga framsteg ingår inte.</p>

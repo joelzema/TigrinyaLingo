@@ -1,0 +1,57 @@
+@model LearnViewModel
+@{ ViewData["Title"] = "Fortsätt lära"; var next = Model.NextLesson; var nextCourse = Model.NextCourse; }
+@section Styles { <link rel="stylesheet" href="~/css/learning-path.css" asp-append-version="true" /> }
+<div class="path-shell">
+<header class="path-header"><p class="learning-eyebrow">Din språkresa · ett steg i taget</p><h1>Fortsätt lära</h1><p>Här hittar du ditt nästa steg och ser vägen genom lektionerna.</p></header>
+<div class="preference-summary"><span>Din startpunkt: <strong>@TigrinyaLingo.Services.LearningPreferenceService.Label(Model.Experience ?? Domain.Entities.LearningExperience.Beginner)</strong></span><a asp-controller="LearningPreferences" asp-action="Index">Ändra förkunskaper →</a><a asp-controller="Placement" asp-action="Index">Gör ett frivilligt nivåtest →</a></div>
+<div class="path-summary" aria-label="Dina framsteg"><div><strong>@Model.CompletedCount / @Model.AvailableCount</strong><span>lektioner klara</span></div><div><strong>@Model.TotalXp XP</strong><span>Nivå @Model.Level</span></div><div><strong>@Model.PendingReviewCount</strong><span>uttryck att repetera</span></div></div>
+<section class="path-next" aria-labelledby="next-action-title">
+<p class="learning-eyebrow">Rekommenderat för dig</p>
+@if (Model.PendingReviewCount > 0) {
+<h2 id="next-action-title">Låt de svåra orden fastna</h2><p>@Model.PendingReviewCount uttryck väntar på repetition. En kort omgång hjälper dig att komma ihåg det du redan mött.</p><a class="btn btn-primary" asp-controller="DailyTraining" asp-action="Index">Repetera mina uttryck</a>
+@if (next is not null) { <p class="path-next-alternative">Du kan också fortsätta med <a asp-controller="Lessons" asp-action="Details" asp-route-id="@next.Id">@next.Title</a>.</p> }
+} else if (next is not null) {
+<h2 id="next-action-title">@(next.BestScore.HasValue ? "Gör klart: " : Model.CompletedCount == 0 ? "Börja med: " : "Nästa steg: ")@next.Title</h2><p>@(nextCourse!.Title) · @next.WordCount ord och uttryck. Lär dig uttrycken och prova sedan fyra svarsalternativ.</p><a class="btn btn-primary" asp-controller="Lessons" asp-action="Details" asp-route-id="@next.Id">@(next.BestScore.HasValue ? "Fortsätt med lektionen" : Model.CompletedCount == 0 ? "Börja lära" : "Starta nästa lektion")</a>
+} else if (Model.AvailableCount > 0) {
+<h2 id="next-action-title">Du har klarat alla lektioner!</h2><p>Håll uttrycken levande med repetition och spel. Du kan alltid göra om en klar lektion.</p>@if (Model.CanPlay) { <a class="btn btn-primary" asp-controller="Games" asp-action="Index">Spela med mina ord</a> } else { <a class="btn btn-primary" asp-controller="DailyTraining" asp-action="Index">Repetera mina uttryck</a> }
+} else {
+<h2 id="next-action-title">Dina lektioner kommer här</h2><p>Det finns inga färdiga lektioner just nu. Utforska kursutbudet och kom tillbaka när innehållet är klart.</p><a class="btn btn-primary" asp-controller="Courses" asp-action="Index">Utforska kurser</a>
+}
+</section>
+<nav class="discovery-section" aria-label="Genvägar till övningar">
+    <h2>Öva på egen hand</h2>
+    <div class="practice-links">
+        <a asp-controller="Tenses" asp-action="Index"><strong>Nutid, dåtid och framtid</strong><span>Jämför tidsformer och skriv en replik.</span></a>
+        <a asp-controller="FirstMeeting" asp-action="Index"><strong>Skriv en dialog</strong><span>Träna på ett första möte.</span></a>
+        <a asp-controller="DailyTraining" asp-action="Index"><strong>Dagens träning</strong><span>Repetera uttrycken från dina lektioner.</span></a>
+    </div>
+    <div class="discovery-more">
+        @if (Model.CanPlay) { <a asp-controller="Games" asp-action="Index">Para ihop och Memory</a> }
+        @if (Model.CompletedCount > 0) { <a asp-controller="Conversations" asp-action="Index">Vardagssamtal</a> <a asp-controller="AddressPractice" asp-action="Index">Träna tilltal</a> }
+        <a asp-controller="Progress" asp-action="Index">Mina framsteg</a>
+    </div>
+</nav>
+<div class="path-explanation"><span class="path-rule-icon" aria-hidden="true">↗</span><p><strong>Din väg, din takt.</strong> Alla färdiga lektionsquiz är öppna. Följ rekommendationen eller välj en annan lektion nedan. Alla rätt gör lektionen klar; förkunskapsvalet ger inga XP och klarar inga lektioner åt dig.</p></div>
+<partial name="_TensePracticeNext" model="Model.TensePractice" />
+@foreach (var course in Model.Courses) {
+<section class="path-course" aria-labelledby="course-@course.Id-title">
+<div class="path-course-heading"><div><p class="learning-eyebrow">Din lärväg</p><h2 id="course-@course.Id-title">@course.Title</h2></div><span class="path-course-count">@course.CompletedCount av @course.AvailableCount klara</span></div>
+@if (course.AvailableCount > 0) { <progress class="course-progress" max="@course.AvailableCount" value="@course.CompletedCount" aria-label="Klara lektioner i @course.Title">@course.CompletedCount</progress> }
+@if (course.Lessons.Count == 0) { <p class="text-muted">Lektioner kommer snart.</p> }
+<ol class="path-lessons">
+@foreach (var lesson in course.Lessons) {
+var state = !lesson.IsReady ? "coming" : lesson.IsCompleted ? "complete" : lesson.IsLocked ? "locked" : "available";
+<li class="path-lesson path-@state" data-lesson-id="@lesson.Id" data-lesson-state="@state">
+<span class="path-node" aria-hidden="true">@(lesson.IsCompleted ? "✓" : lesson.IsLocked ? "○" : lesson.Order.ToString())</span>
+<div class="path-lesson-copy"><p class="path-status">@(!lesson.IsReady ? "Innehåll kommer snart" : lesson.IsCompleted ? "Klar · öva igen när du vill" : lesson.IsLocked ? "Quizet är låst" : lesson.BestScore.HasValue ? "Påbörjad · fortsätt öva" : "Redo att börja")</p><h3>@lesson.Title</h3><p>@lesson.WordCount ord och uttryck
+@if (lesson.BestScore.HasValue)
+{
+    <span> · Bästa resultat: @lesson.BestScore av @lesson.WordCount</span>
+}</p>@if (lesson.IsLocked) { <p class="path-required">Gör klart @lesson.RequiredLessonTitle för att öppna quizet. Ordkorten går att läsa redan nu.</p> }</div>
+@if (lesson.IsReady) { <a class="btn @(lesson.IsLocked || lesson.IsCompleted ? "btn-outline-primary" : "btn-primary")" asp-controller="Lessons" asp-action="Details" asp-route-id="@lesson.Id">@(lesson.IsLocked ? "Läs ordkorten" : lesson.IsCompleted ? "Öva igen" : lesson.BestScore.HasValue ? "Fortsätt" : "Börja")<span class="visually-hidden">: @lesson.Title</span></a> }
+</li>
+}
+</ol></section>
+}
+
+</div>

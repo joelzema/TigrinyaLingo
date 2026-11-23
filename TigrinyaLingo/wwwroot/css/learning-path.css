@@ -1,0 +1,35 @@
+.path-shell { max-width: 960px; margin: 2rem auto 3rem; }
+.path-header h1 { font-size: clamp(2.1rem,5vw,3.2rem); font-weight: 800; letter-spacing: -.04em; color: #243c34; }
+.path-header > p:last-child { color: #52645b; max-width: 600px; font-size: 1.08rem; }
+.path-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin: 1.75rem 0; }
+.path-summary > div { border: 1px solid #d9dfcf; background: #fffdf8; border-radius: 18px; padding: 1rem 1.25rem; }
+.path-summary strong { display: block; font-size: 1.65rem; font-weight: 800; color: #315a3b; }
+.path-summary span { color: #52645b; font-size: .9rem; }
+.path-next { padding: 2rem; border: 1px solid #bdd0b0; border-left: 6px solid #68934f; border-radius: 22px; background: linear-gradient(110deg,#edf4e6,#fffdf8); }
+.path-next h2 { font-size: clamp(1.5rem,4vw,2rem); font-weight: 800; color: #243c34; }
+.path-next p:not(.learning-eyebrow) { max-width: 650px; }
+.path-next-alternative { margin: 1rem 0 0; font-size: .92rem; }
+.path-next-alternative a { color: #315a3b; font-weight: 600; }
+.path-explanation { display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem .5rem; color: #52645b; }
+.path-explanation p { margin: 0; line-height: 1.65; }
+.path-rule-icon { display: grid; place-items: center; border-radius: 12px; background: #eee8dc; color: #6b573e; width: 40px; height: 40px; flex-shrink: 0; font-size: 1.5rem; }
+.path-course { padding-top: 1.5rem; }
+.path-course-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: center; margin-bottom: 1rem; }
+.path-course-heading h2 { font-size: 1.5rem; font-weight: 800; }
+.path-course-count { background: #e8f0e1; color: #315a3b; padding: .4rem .8rem; border-radius: 20px; white-space: nowrap; font-size: .85rem; }
+.path-lessons { list-style: none; padding: 0; margin: 1.5rem 0 2.5rem; }
+.path-lesson { display: flex; align-items: center; gap: 1.25rem; position: relative; padding: 1.35rem; border: 1px solid #d9dfcf; border-radius: 18px; background: #fffdf8; margin-bottom: 1rem; }
+.path-node { display: grid; place-items: center; flex: 0 0 48px; height: 48px; border: 2px solid #a5b894; border-bottom-width: 4px; border-radius: 16px; color: #315a3b; font-size: 1.25rem; font-weight: 800; background: #eef4e6; }
+.path-lesson-copy { flex: 1; min-width: 0; }
+.path-lesson h3 { font-size: 1.1rem; font-weight: 750; margin: .2rem 0 .4rem; }
+.path-lesson p { margin: 0; color: #52645b; font-size: .9rem; }
+.path-lesson .path-status { font-size: .75rem; font-weight: 750; text-transform: uppercase; letter-spacing: .05em; }
+.path-available { border: 2px solid #91ae7b; box-shadow: 0 4px 0 #dce7d0; }
+.path-complete .path-node { background: #4f7f41; color: white; border-color: #426d35; }
+.path-complete .path-status { color: #315a3b; }
+.path-locked { background: #f5f3ed; }
+.path-locked .path-node, .path-coming .path-node { background: #ebe9e1; border-color: #c7c7b9; color: #6b6b5b; }
+.path-lesson .path-required { margin-top: .5rem; color: #6b573e; }
+.path-practice { background: #fffdf8; border: 1px solid #d9dfcf; border-radius: 20px; padding: 1.5rem; }
+.path-practice h2 { font-size: 1.35rem; font-weight: 750; }
+@media(max-width:600px) { .path-shell{margin-top:1rem}.path-summary{gap:.5rem}.path-summary>div{padding:.8rem .5rem}.path-summary strong{font-size:1.3rem}.path-summary span{font-size:.75rem}.path-next{padding:1.25rem}.path-course-heading{align-items:flex-start;flex-direction:column;gap:.25rem}.path-lesson{flex-wrap:wrap;gap:.8rem;padding:1rem}.path-lesson-copy{flex-basis:calc(100% - 65px)}.path-lesson>.btn{margin-left:60px}.path-node{flex-basis:44px;height:44px}.path-lesson .btn{max-width:100%;white-space:normal}.path-explanation{gap:.75rem} }

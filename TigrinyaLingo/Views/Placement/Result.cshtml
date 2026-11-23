@@ -1,0 +1,34 @@
+@model PlacementResult
+@{ ViewData["Title"]="Din föreslagna startpunkt"; }
+<div class="preference-shell placement-shell">
+    <header class="learning-header"><p class="learning-eyebrow">Ditt smakprov är klart</p><h1>Din föreslagna startpunkt</h1><p>Det här är vägledning från nio skrivna frågor, inte ett betyg på din tigrinja.</p></header>
+    <section class="learning-card mb-4"><p class="placement-score">@Model.Correct av @Model.Total rätt</p><p>@Model.Skipped frågor hoppades över. Överhoppade frågor räknas som sådant att utforska vidare.</p><p>@Model.Advice</p><h2 class="h4">Börja gärna med: @Model.LessonTitle</h2>
+        <form asp-controller="LearningPreferences" asp-action="Index" method="post">
+            <input type="hidden" name="Experience" value="@((int)Model.SuggestedExperience)" />
+            <input type="hidden" name="ReturnUrl" value="@Url.Action("Details","Lessons",new {id=Model.LessonId})" />
+            <button class="btn btn-primary" type="submit">Använd förslaget och börja</button>
+        </form>
+        <p class="small text-muted mt-3 mb-0">Knappen uppdaterar ditt förkunskapsval. Testet har hittills inte ändrat din startpunkt, XP, lektioner eller repetition.</p>
+        <a class="d-inline-block mt-3" asp-controller="LearningPreferences" asp-action="Index">Jag vill välja själv →</a>
+    </section>
+    <h2 class="h4">Det här visade frågorna</h2>
+    <div class="placement-area-grid mb-4">
+    @foreach(var area in Model.Areas)
+    {
+        <article class="learning-card"><h3 class="h5">@area.Name</h3><p><strong>@area.Correct av @area.Total rätt</strong> · @area.Skipped överhoppade</p><p class="mb-0">@(area.Correct==area.Total ? "Du kände igen exemplen i det här urvalet." : "Det här är ett bra område att öva vidare på.")</p>
+        @if (area.Correct < area.Total && ViewData["PracticeAreas"] is HashSet<string> available && available.Contains(area.Name))
+        {
+            <a class="btn btn-outline-primary mt-3" asp-action="Practice" asp-route-token='@ViewData["PracticeToken"]' asp-route-area="@area.Name">Träna på @area.Name.ToLowerInvariant()</a>
+        }
+        </article>
+    }
+    </div>
+    <details class="learning-card mb-4"><summary>Gå igenom dina @Model.Total svar</summary>
+    @foreach(var answer in Model.Answers)
+    {
+        <article class="placement-feedback"><h3 class="h6">@answer.Prompt</h3><p class="@(answer.Correct ? "progress-completed" : "text-muted")">@(answer.Skipped ? "Överhoppad" : answer.Correct ? "Rätt" : "Öva vidare")</p><p>Ditt val: @answer.Answer</p><p>Rätt svar: <strong>@answer.CorrectAnswer</strong></p>@if(answer.Explanation is not null) { <p class="small">@answer.Explanation</p> }</article>
+    }
+    </details>
+    <div class="d-flex gap-2 flex-wrap"><a class="btn btn-outline-primary" asp-action="Start">Gör ett nytt test</a><a class="btn btn-outline-primary" asp-controller="Learn" asp-action="Index">Till min lärväg</a></div>
+    <p class="small text-muted mt-3">Testomgången och resultatet visas i högst en timme. Ditt val av startpunkt sparas på kontot om du väljer att använda förslaget.</p>
+</div>

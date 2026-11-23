@@ -1,0 +1,83 @@
+@model PhraseEditViewModel
+@{ ViewData["Title"] = "Redigera fras – " + Model.LessonTitle; }
+<div class="quiz-shell">
+    <nav aria-label="Brödsmulor"><ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Ord och fraser</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.LessonTitle</li>
+    </ol></nav>
+    <header class="learning-header">
+        <p class="learning-eyebrow">@Model.LessonTitle</p>
+        <h1>Redigera frasen</h1>
+        <p class="text-muted">Spara här för att uppdatera innehållet i appen direkt.</p>
+    </header>
+    @if (TempData["ContentEditorMessage"] is string message)
+    {
+        <div class="alert alert-success" role="status">@message</div>
+    }
+    @if (Model.HasConflict)
+    {
+        <section class="learning-card mb-4" aria-labelledby="current-version-title">
+            <h2 class="h4" id="current-version-title">Versionen som är sparad just nu</h2>
+            <p lang="ti-Latn">@Model.CurrentLatinText</p>
+            <p>@Model.CurrentTenseStatus</p>
+            <p>@Model.CurrentTenseContext</p><p>@Model.CurrentTenseNotes</p>
+            <partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(Model.CurrentLatinText, Model.CurrentAudience))" />
+            <ul>@foreach (var text in Model.CurrentChoices) { <li>@text</li> }</ul>
+            <p class="small mb-0">Dina inmatade ändringar finns kvar i formuläret. Granska skillnaderna innan du sparar igen.</p>
+        </section>
+    }
+    <form method="post" asp-action="Edit" asp-route-id="@Model.Id" class="learning-card">
+        <input asp-for="EditStamp" type="hidden" />
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <div class="mb-4">
+            <label asp-for="LatinText" class="form-label fw-semibold"></label>
+            <input asp-for="LatinText" class="form-control form-control-lg" lang="ti-Latn" maxlength="200" aria-describedby="latin-help" />
+            <div id="latin-help" class="form-text">Skriv med latinska bokstäver, så som uttrycket ska visas för den som lär sig.</div>
+            <span asp-validation-for="LatinText" class="text-danger"></span>
+        </div>
+        <partial name="_AudienceField" model="Model.Audience" />
+        <partial name="_TenseFields" model="Model" />
+        <partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(Model.LatinText, Model.Audience, true))" />
+        <fieldset class="mb-4">
+            <legend class="h5">Svenska svarsalternativ</legend>
+            <p class="small text-muted">Fyll i fyra olika svar. Markera det rätta svaret – det används också som frasens svenska betydelse.</p>
+            @for (var index = 0; index < Model.Choices.Count; index++)
+            {
+                var choice = Model.Choices[index];
+                <div class="editor-choice mb-3">
+                    <input asp-for="Choices[index].Id" type="hidden" />
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="CorrectChoiceId" id="correct-@choice.Id" value="@choice.Id" checked="@(choice.Id == Model.CorrectChoiceId)" required />
+                        <label class="form-check-label" for="correct-@choice.Id">Alternativ @(index + 1) är rätt svar</label>
+                    </div>
+                    <label asp-for="Choices[index].Text" class="visually-hidden">Svenskt svar @(index + 1)</label>
+                    <input asp-for="Choices[index].Text" class="form-control" maxlength="200" />
+                    <span asp-validation-for="Choices[index].Text" class="text-danger"></span>
+                </div>
+            }
+            <span asp-validation-for="CorrectChoiceId" class="text-danger"></span>
+        </fieldset>
+        <div class="mb-4">
+            <label asp-for="AudioFileName" class="form-label fw-semibold"></label>
+            <select asp-for="AudioFileName" class="form-select" aria-describedby="audio-help">
+                <option value="">Ingen inspelning</option>
+                @foreach (var file in Model.AudioFiles) { <option value="@file">@file</option> }
+            </select>
+            <span asp-validation-for="AudioFileName" class="text-danger"></span>
+            <p class="form-text" id="audio-help">När du ändrar tigrinjafrasen kopplas den gamla inspelningen bort när du sparar. Välj en annan inspelning om den passar den nya frasen, eller Ingen inspelning. Ljudet spelas inte in på nytt automatiskt.</p>
+            @if (Model.AudioFileName is not null && Model.AudioFiles.Contains(Model.AudioFileName))
+            {
+                <p class="small mb-1">Lyssna på den valda inspelningen i den sparade versionen:</p>
+                <partial name="_WordAudio" model="@(new AudioPlayerViewModel { AudioFileName = Model.AudioFileName, Label = Model.LatinText })" />
+            }
+        </div>
+        <p class="small text-muted">Ändringen gäller alla som använder den här databasen. Befintliga resultat ligger kvar. Kontrollera även att lektionens tips fortfarande passar.</p>
+        <div class="d-flex flex-wrap gap-3">
+            <button type="submit" class="btn btn-primary btn-lg">Spara ändringar</button>
+            <a class="btn btn-outline-primary" asp-action="Index">Tillbaka utan att spara</a>
+        </div>
+    </form>
+    <a class="btn btn-outline-primary mt-3 me-2" asp-controller="PhraseCreation" asp-action="Index" asp-route-lessonId="@Model.LessonId">Lägg till en fras i lektionen</a>
+    <a class="btn btn-outline-primary mt-3" asp-controller="Lessons" asp-action="Details" asp-route-id="@Model.LessonId">Öppna lektionen</a>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

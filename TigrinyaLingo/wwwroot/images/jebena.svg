@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 144" fill="none">
+  <!-- Egenritad, stiliserad jebena: rund kropp, smal hals och en öppning upptill. -->
+  <g stroke="#8b644a" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M73 57C97 44 115 62 105 83L94 99" stroke-width="4"/>
+    <path d="M45 25C49 39 48 50 43 61C39 69 27 73 23 87C18 105 26 121 41 127C52 131 66 131 79 126C94 120 100 106 95 90C91 77 76 72 71 61C66 50 67 39 70 25" fill="#f6eddf" stroke-width="3.8"/>
+    <ellipse cx="57.5" cy="24" rx="13" ry="4" fill="#f6eddf" stroke-width="3.2"/>
+    <path d="M48 43Q58 46 67 43M36 132H80" stroke-width="2.5"/>
+    <path d="M28 94L36 100L44 94L52 100L60 94L68 100L76 94L84 100L91 94" stroke-width="1.5" opacity=".6"/>
+    <path d="M53 13C48 8 56 6 52 2M64 14C59 9 67 7 63 3" stroke-width="2" opacity=".65"/>
+  </g>
+</svg>

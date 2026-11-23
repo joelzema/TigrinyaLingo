@@ -1,0 +1,16 @@
+@page
+@model TigrinyaLingo.Areas.Identity.Pages.Account.LoginModel
+@{ ViewData["Title"] = "Logga in"; }
+<header class="learning-header"><p class="learning-eyebrow">Ditt konto</p><h1>Logga in</h1><p>Fortsätt med dina quiz och sparade framsteg.</p></header>
+<div class="row"><div class="col-lg-7"><section class="learning-card">
+    <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <div class="mb-3"><label asp-for="Input.Email" class="form-label"></label><input asp-for="Input.Email" class="form-control" autocomplete="username" inputmode="email" /><span asp-validation-for="Input.Email" class="text-danger"></span></div>
+        <div class="mb-3"><label asp-for="Input.Password" class="form-label"></label><input asp-for="Input.Password" class="form-control" autocomplete="current-password" /><span asp-validation-for="Input.Password" class="text-danger"></span></div>
+        <div class="form-check mb-3"><input asp-for="Input.RememberMe" class="form-check-input" /><label asp-for="Input.RememberMe" class="form-check-label"></label></div>
+        <button type="submit" class="btn btn-primary">Logga in</button>
+    </form>
+    <p class="mt-3 mb-0">Ny här? <a asp-page="Register" asp-route-returnUrl="@Model.ReturnUrl">Skapa konto</a></p>
+</section></div></div>
+<a class="btn btn-outline-primary mt-3" asp-area="" asp-controller="Courses" asp-action="Index">Utforska kurser utan konto</a>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

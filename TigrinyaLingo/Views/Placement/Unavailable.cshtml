@@ -1,0 +1,3 @@
+@model string
+@{ ViewData["Title"]="Starta ett nytt nivåtest"; }
+<div class="preference-shell learning-card"><h1 class="h3">Testet kunde inte slutföras</h1><p>@Model</p><div class="d-flex gap-2 flex-wrap"><a class="btn btn-primary" asp-action="Index">Till nivåtestet</a><a class="btn btn-outline-primary" asp-controller="LearningPreferences" asp-action="Index">Välj förkunskaper själv</a></div></div>

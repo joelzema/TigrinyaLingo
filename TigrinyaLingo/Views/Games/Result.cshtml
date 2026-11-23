@@ -1,0 +1,13 @@
+@model MatchGameResultViewModel
+@{ var memory = Model.Mode == MatchGameMode.Memory; ViewData["Title"] = "Snyggt spelat!"; }
+@section Styles { <link rel="stylesheet" href="~/css/games.css" asp-append-version="true" /> }
+<section class="games-shell game-result">
+<p class="learning-eyebrow">@(memory ? "Memory" : "Para ihop") · omgång klar</p><div class="game-stars" aria-label="@Model.Stars av 3 stjärnor">@(new string('★', Model.Stars))@(new string('☆', 3 - Model.Stars))</div>
+<h1>Du hittade alla par!</h1><p>Varje omgång gör uttrycken lite mer bekanta.</p>
+<div class="game-result-stats"><div><strong>@Model.Points</strong><span>spelpoäng</span></div><div><strong>@Model.PairCount</strong><span>matchade par</span></div><div><strong>@Model.FirstTryCount</strong><span>på första försöket</span></div></div>
+@if (Model.Outdated) { <p class="alert alert-info">Dina fraser eller framsteg ändrades medan du spelade. Omgångens poäng visas här, men din nyare repetition har behållits.</p> }
+else if (Model.ReviewSaved) { <p>Din repetition är uppdaterad. @(Model.Words.Any(word => word.NeedsPractice) ? "Ord som var svåra finns kvar att öva på." : "Alla uttryck i omgången matchades på första försöket!")</p> }
+else if (memory) { <p>Minne och språk tränade! Memory ändrar inte vilka ord du behöver repetera.</p> }
+<div class="game-result-actions"><a class="btn btn-primary" asp-action="Match" asp-route-mode="@Model.Mode">Spela igen</a><a class="btn btn-outline-primary" asp-action="Index">Byt spel</a>@if (Model.PendingReviewCount > 0) { <a class="btn btn-outline-primary" asp-controller="DailyTraining" asp-action="Index">Repetera uttryck</a> }</div>
+<details class="game-word-list"><summary>Omgångens @Model.PairCount uttryck</summary>@foreach (var word in Model.Words) { <div class="game-result-word"><div><strong lang="ti-Latn">@word.LatinText</strong><span>@word.Meaning</span><partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(word.LatinText, word.Audience, true))" /></div>@if (word.AudioFileName is not null) { <audio class="word-audio" controls preload="none" aria-label="Lyssna på @word.LatinText"><source src="@Url.Content("~/audio/tigrinya/" + word.AudioFileName)" type="audio/mpeg" /></audio> }</div> }</details>
+</section>

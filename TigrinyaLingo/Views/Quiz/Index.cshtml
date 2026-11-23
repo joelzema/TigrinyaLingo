@@ -1,0 +1,147 @@
+@model QuizViewModel
+@{ ViewData["Title"] = Model.IsDaily ? "Dagens träning" : (Model.IsReview ? "Öva på mina fel – " : "Lektion – ") + Model.LessonTitle; var practice = LessonPracticeGuide.For(Model.LessonId); }
+
+<div class="quiz-shell">
+    <nav class="quiz-topline" aria-label="Övning">
+        @if (Model.IsDaily)
+        {
+            <a class="quiz-exit" asp-controller="Progress" asp-action="Index" aria-label="Avsluta övningen">×</a>
+        }
+        else
+        {
+        <a class="quiz-exit" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId" aria-label="Avsluta övningen">×</a>
+        }
+        <div><p class="learning-eyebrow mb-0">@(Model.IsReview ? "Repetition" : "Dagens lärstund")</p><span>@Model.LessonTitle</span></div>
+        <span class="quiz-mode-tag">@(Model.IsDaily ? "Blandad repetition" : Model.IsReview ? "Dina svåra ord" : "Lär och öva")</span>
+    </nav>
+    <header class="quiz-intro">
+        <h1 class="visually-hidden">@(Model.IsDaily ? "Dagens träning" : Model.IsReview ? "Öva på mina fel" : "Lektion: " + Model.LessonTitle)</h1>
+        @if (Model.IsReview && !Model.IsDaily)
+        {
+            <p class="small text-muted mb-0">Rätt svar tar bort ordet från repetitionslistan. Repetition ändrar inte lektionens bästa resultat eller XP.</p>
+        }
+    </header>
+    @if (Model.IsDaily)
+    {
+        <p class="lesson-session-goal">@Model.Questions.Count blandade frågor från lektioner du har gjort. Tidigare fel prioriteras.</p>
+        <p class="small text-muted">Dina senaste svar uppdaterar repetitionslistan. Bästa lektionsresultat och XP är oförändrade.</p>
+    }
+    @if (!Model.IsReview && practice is not null)
+    {
+        <p class="lesson-session-goal">@practice.Goal</p>
+        <details class="lesson-session-tips">
+            <summary>Tips för den här lektionen</summary>
+            <p>@practice.Context</p>
+        </details>
+    }
+    @if (!Model.IsReview && Model.Questions.Count > 0 && Model.Questions.All(question => string.IsNullOrWhiteSpace(question.AudioFileName)))
+    {
+        <p class="small text-muted">Den här lektionen har ännu inga uttalsinspelningar. Du tränar genom läsning och översättning.</p>
+    }
+    @if (Model.StatusMessage is not null)
+    {
+        <p class="alert alert-info" role="status">@Model.StatusMessage</p>
+    }
+    @if (!Model.IsAvailable)
+    {
+        <section class="learning-empty">
+            <h2 class="h4">@(Model.IsDaily ? "Börja med en lektion" : Model.IsReview && Model.Questions.Count == 0 ? "Inga fel att öva på" : "Quizet kommer snart")</h2>
+            <p>@(Model.IsDaily ? "Gör och spara din första lektion. Då kan vi sätta ihop en personlig träning med de ord du har mött." : Model.IsReview && Model.Questions.Count == 0 ? "Du har inga sparade repetitionsord här. Gör hela quizet om du vill testa dig igen." : "Den här lektionens quiz är inte färdigt ännu.")</p>
+            @if (Model.IsDaily) { <a class="btn btn-primary" asp-controller="Courses" asp-action="Index">Hitta min första lektion</a> }
+        </section>
+    }
+    else
+    {
+        @if (Model.Questions.Any(question => PhraseUsageGuide.For(question.LatinText, question.Audience) is not null))
+        {
+            <partial name="_AudienceExplanation" />
+        }
+        <form method="post" asp-controller="@(Model.IsDaily ? "DailyTraining" : "Quiz")" asp-action="@(Model.IsDaily ? "Submit" : Model.IsReview ? "SubmitReview" : "Submit")" asp-route-id="@(Model.IsDaily ? (int?)null : Model.LessonId)"
+              class="quiz-run" data-quiz-run data-check-url="@(Model.IsDaily ? Url.Action("CheckAnswer", "DailyTraining") : Url.Action("CheckAnswer", "Quiz", new { id = Model.LessonId }))">
+            @if (Model.IsDaily) { <input type="hidden" name="SessionToken" value="@Model.SessionToken" /> }
+            <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
+            <div class="quiz-hud" data-quiz-hud hidden>
+                <div class="quiz-hud-label"><span data-step-label>Fråga 1 av @Model.Questions.Count</span><span data-correct-label>0 rätt</span></div>
+                <progress class="quiz-track" data-quiz-progress value="0" max="@Model.Questions.Count" aria-label="Besvarade frågor"></progress>
+            </div>
+            @for (var index = 0; index < Model.Questions.Count; index++)
+            {
+                var question = Model.Questions[index];
+                var instruction = question.Kind == ExerciseKind.Listen ? "Vad hör du?" : question.Kind == ExerciseKind.Translate ? "Hur säger du det på tigrinja?" : "Vad betyder uttrycket?";
+                var mode = question.Kind == ExerciseKind.Listen ? "LYSSNA" : question.Kind == ExerciseKind.Translate ? "SVENSKA → TIGRINJA" : "LÄS OCH VÄLJ";
+                @if (!Model.IsReview)
+                {
+                    <section class="quiz-stage lesson-discovery" data-learn-step aria-label="Lär dig uttryck @(index + 1)">
+                        <p class="quiz-stage-kind">LÄR DIG · UTTRYCK @(index + 1) AV @Model.Questions.Count</p>
+                        <h2 class="quiz-stage-title" data-learn-title tabindex="-1">@question.StudyMeaning</h2>
+                        <p class="quiz-prompt spoken-word" lang="ti-Latn">@question.LatinText</p>
+                @if (question.TenseHint is { } timeHint) { <partial name="_TenseHint" model="timeHint" /> }
+                        <partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(question.LatinText, question.Audience, true))" />
+                        @if (!string.IsNullOrWhiteSpace(question.AudioFileName))
+                        {
+                            <partial name="_WordAudio" model="@(new AudioPlayerViewModel { AudioFileName = question.AudioFileName, Label = question.LatinText })" />
+                            <p class="small text-muted">Lyssna, säg efter och prova sedan själv.</p>
+                        }
+                        else
+                        {
+                            <p class="small text-muted">Läs betydelsen och försök minnas uttrycket. Uttalsinspelning kommer senare.</p>
+                        }
+                    </section>
+                }
+                <fieldset class="quiz-stage" data-question data-question-id="@question.Id" data-kind="@question.Kind">
+                    <legend class="visually-hidden">@instruction</legend>
+                    <h2 class="quiz-stage-title" data-stage-title>@instruction</h2>
+                    <p class="quiz-stage-kind">@mode <span class="quiz-fallback-number">· Fråga @(index + 1) av @Model.Questions.Count</span></p>
+                    <input type="hidden" name="Answers[@index].QuestionId" value="@question.Id" />
+                    <input type="hidden" name="Answers[@index].Kind" value="@question.Kind" />
+                    @if (question.Kind == ExerciseKind.Listen)
+                    {
+                        <div class="quiz-sound-orb" aria-hidden="true">♫</div>
+                        <partial name="_WordAudio" model="@(new AudioPlayerViewModel { AudioFileName = question.AudioFileName ?? string.Empty, Label = "uttryck " + (index + 1) })" />
+                        <p class="quiz-prompt" lang="ti-Latn">@question.LatinText</p>
+                    }
+                    else
+                    {
+                        <p class="quiz-prompt" lang="@(question.Kind == ExerciseKind.Translate ? "sv" : "ti-Latn")">@question.Prompt</p>
+                    }
+                    <partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(question.LatinText, question.Audience))" />
+                    <div class="quiz-options quiz-answer-grid">
+                        @for (var choiceIndex = 0; choiceIndex < question.Choices.Count; choiceIndex++)
+                        {
+                            var choice = question.Choices[choiceIndex];
+                            <div class="quiz-option">
+                                <input type="radio" id="question-@question.Id-choice-@choice.Id" name="Answers[@index].ChoiceId" value="@choice.Id" checked="@(question.SelectedChoiceId == choice.Id)" required />
+                                <label for="question-@question.Id-choice-@choice.Id" lang="@(question.Kind == ExerciseKind.Translate ? "ti-Latn" : "sv")"><span class="quiz-option-key" aria-hidden="true">@(choiceIndex + 1)</span><span>@choice.Text</span>
+                                    @if (choice.UsageLabel is not null) { <small class="phrase-choice-label" lang="sv">@choice.UsageLabel</small> }
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </fieldset>
+            }
+            <div class="quiz-controls" data-quiz-controls hidden>
+                <div class="quiz-feedback" data-feedback role="status" aria-live="polite" aria-atomic="true"><strong data-feedback-title>Välj ett alternativ</strong><span data-feedback-detail>Du kan också använda tangenterna 1–4.</span></div>
+                <button type="button" class="quiz-continue" data-quiz-action disabled>Kontrollera</button>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg" data-quiz-submit>@(Model.IsReview ? "Rätta övningen" : "Rätta och spara")</button>
+            <p class="quiz-save-note">Dina framsteg sparas när hela övningen avslutas.</p>
+        </form>
+    @if (!Model.IsReview && practice is not null)
+        {
+            <section class="learning-card lesson-speaking-finish" data-speaking-finish hidden aria-labelledby="session-speaking-title">
+                <p class="learning-eyebrow">Din tur att prata</p>
+                <h2 class="h4" id="session-speaking-title" tabindex="-1">Använd det du har lärt dig</h2>
+                <p>@practice.Challenge</p>
+                <p class="small text-muted">Prova högt för dig själv. Den här övningen bedömer inte ditt tal.</p>
+                <button type="button" class="quiz-continue" data-finish-lesson>Visa mitt resultat</button>
+            </section>
+        }
+}
+    @if (Model.IsReview && !Model.IsDaily)
+    {
+        <a class="btn btn-outline-primary mt-3" asp-action="Index" asp-route-id="@Model.LessonId">Gör hela quizet</a>
+    }
+</div>
+@section Scripts {
+    <script src="~/js/quiz-run.js" asp-append-version="true" defer></script>
+}

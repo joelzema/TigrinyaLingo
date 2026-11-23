@@ -1,0 +1,56 @@
+@model FirstMeetingTurn
+@{ ViewData["Title"] = "Ett första möte"; }
+<div class="preference-shell">
+    <a asp-controller="Conversations" asp-action="Index">← Vardagssamtal</a>
+    <header class="learning-header"><p class="learning-eyebrow">Skriv en dialog</p><h1>Ett första möte</h1></header>
+    @if (Model == null)
+    {
+        <p class="learning-card">En av fraserna behöver granskas innan dialogen kan öppnas.</p>
+    }
+    else
+    {
+        <section class="learning-card">
+            <p class="learning-eyebrow">Replik @Model.Step av 3</p>
+            <p>@Model.Partner</p><h2 class="h4">@Model.Prompt</h2>
+            @if (Model.Feedback != null)
+            {
+                <p class="alert @(Model.Correct ? "alert-success" : "alert-info")" role="status">@Model.Feedback</p>
+            }
+            @if (Model.Correct)
+            {
+                <p><strong>@Model.Expected</strong></p>
+                @if (Model.Step < 3)
+                {
+                    <a class="btn btn-primary" asp-action="Index" asp-route-step="@(Model.Step + 1)">Fortsätt samtalet</a>
+                }
+                else
+                {
+                    <p>Du har hälsat, frågat hur hon mår och presenterat dig.</p>
+                    <a class="btn btn-primary" asp-controller="Learn" asp-action="Index">Till min lärväg</a>
+                    <a class="btn btn-outline-primary" asp-action="Index">Öva igen</a>
+                }
+            }
+            else
+            {
+                <form asp-action="Answer" method="post">
+                    <input type="hidden" name="step" value="@Model.Step" />
+                    <label for="meeting-answer">Ditt svar på tigrinja</label>
+                    <input class="form-control mb-3" id="meeting-answer" name="answer" value="@Model.Attempt" maxlength="200" required autocomplete="off" spellcheck="false" />
+                    <button class="btn btn-primary" type="submit">Kolla svaret</button>
+                </form>
+                <details class="mt-3"><summary>Visa ledtråd</summary>
+                    <p>Uttrycket börjar med <strong>@(System.Globalization.StringInfo.GetNextTextElement(Model.Expected))…</strong>.</p>
+                    <details><summary>Visa alternativ</summary>
+                        <form asp-action="Answer" method="post" class="d-grid gap-2 mt-2">
+                            <input type="hidden" name="step" value="@Model.Step" />
+                            @foreach (var option in Model.Options)
+                            {
+                                <button class="btn btn-outline-primary" name="answer" value="@option" type="submit">@option</button>
+                            }
+                        </form>
+                    </details>
+                </details>
+            }
+        </section>
+    }
+</div>

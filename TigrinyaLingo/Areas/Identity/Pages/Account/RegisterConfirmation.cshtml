@@ -1,0 +1,18 @@
+@page
+@model TigrinyaLingo.Areas.Identity.Pages.Account.RegisterConfirmationModel
+@{ ViewData["Title"] = "Bekräfta kontot"; }
+<header class="learning-header"><p class="learning-eyebrow">Nästan klart</p><h1>Bekräfta kontot</h1></header>
+<section class="learning-card">
+@if (Model.ConfirmationUrl is not null)
+{
+    <h2 class="h4">Kontot är skapat – ett steg återstår</h2>
+    <p>Du använder utvecklingsversionen. Inget mejl skickas, så du behöver inte vänta på inkorgen.</p>
+    <p>Tryck på knappen för att bekräfta kontot. Därefter kan du logga in och göra quizet.</p>
+    <a id="confirm-link" class="btn btn-primary" href="@Model.ConfirmationUrl">Bekräfta mitt konto</a>
+}
+else
+{
+    <p>Ingen lokal bekräftelselänk finns i den här webbläsaren. Gå tillbaka till fliken där du nyss skapade kontot. Om du redan har bekräftat kontot kan du logga in.</p>
+}
+    <p class="mt-3 mb-0"><a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Till inloggningen</a></p>
+</section>

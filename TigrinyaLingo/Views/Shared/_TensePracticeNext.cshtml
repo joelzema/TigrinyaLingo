@@ -1,0 +1,29 @@
+@model List<TenseGroupViewModel>
+@if (Model.Count > 0)
+{
+    <section class="tense-next-section learning-card mb-4" aria-labelledby="tense-next-title">
+        <p class="learning-eyebrow">Från ord till vardag</p>
+        <h2 id="tense-next-title" class="h4">Använd tidsformerna i en situation</h2>
+        <p>Du har mött formerna i lektionerna. Prova nu att välja vad som passar när något händer nu, har hänt eller ska hända.</p>
+        <div class="tense-next-grid">
+        @foreach (var group in Model)
+        {
+            <article class="tense-next-card">
+                <span class="tense-next-symbol" aria-hidden="true">↗</span>
+                <h3 class="h5">@group.Title</h3>
+                @if (group.CanPractice)
+                {
+                    <p>Tre situationer · fyra alternativ · direkt förklaring</p>
+                    <a class="btn btn-primary" asp-controller="Tenses" asp-action="Play" asp-route-id="@group.Id">Träna i situationer<span class="visually-hidden">: @group.Title</span></a>
+                }
+                else
+                {
+                    <p>Jämför formerna nu. Situationsträningen öppnas när gruppens lektioner är klara och fler kända uttryck finns.</p>
+                }
+                <a class="tense-next-compare" asp-controller="Tenses" asp-action="Details" asp-route-id="@group.Id">Jämför de tre formerna<span class="visually-hidden">: @group.Title</span> →</a>
+            </article>
+        }
+        </div>
+        <p class="small text-muted mt-3 mb-0">Missade former följer med till repetitionen. Träningspoängen gäller omgången; lektionernas XP och upplåsningar påverkas inte.</p>
+    </section>
+}

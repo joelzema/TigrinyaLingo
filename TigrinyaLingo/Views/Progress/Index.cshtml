@@ -1,0 +1,49 @@
+@model ProgressViewModel
+@{ ViewData["Title"] = "Mina framsteg"; }
+<header class="learning-header">
+    <p class="learning-eyebrow">Din egen utveckling</p>
+    <h1>Mina framsteg</h1>
+    <p class="text-muted">Ditt bästa quizresultat sparas för varje lektion. Alla rätt gör lektionen klar.</p>
+</header>
+<p><a class="btn btn-primary" asp-controller="Learn" asp-action="Index">Fortsätt lära – visa mitt nästa steg</a></p>
+<section class="xp-celebration mb-4" aria-labelledby="progress-xp-title" data-total-xp="@Model.TotalXp">
+    <div class="xp-star" aria-hidden="true">✦</div>
+    <div class="xp-summary">
+        <h2 id="progress-xp-title" class="h3">Nivå @Model.Level · @Model.TotalXp XP</h2>
+        <progress class="xp-track" value="@Model.LevelProgress" max="@LearningRewards.XpPerLevel" aria-label="XP mot nästa nivå">@Model.LevelProgress</progress>
+        <p class="mb-0">@(LearningRewards.XpPerLevel - Model.LevelProgress) XP till nästa nivå. Nya bästa resultat och klara lektioner ger XP.</p>
+    </div>
+</section>
+<section class="learning-card course-overview mb-4">
+    <p class="learning-eyebrow">Håll språket levande</p>
+    <h2 class="h4">Dagens träning</h2>
+    <p>Repetera upp till tio uttryck från dina tidigare lektioner. Vi börjar med det som varit svårt och det du inte övat på på länge.</p>
+    <a class="btn btn-primary" asp-controller="DailyTraining" asp-action="Index">Starta dagens träning</a>
+</section>
+<section class="learning-card mb-4"><h2 class="h4">Spela med dina ord</h2><p>Hitta par i Para ihop eller vänd kort i Memory. Korta rundor med uttryck du redan mött.</p><a class="btn btn-outline-primary" asp-controller="Games" asp-action="Index">Utforska spelen</a></section>
+@if (Model.Lessons.Count == 0)
+{
+    <div class="learning-empty"><h2 class="h4">Inga sparade framsteg ännu</h2><p>Gör ett quiz efter din första lektion så visas resultatet här.</p></div>
+}
+else
+{
+    <p class="learning-tag mb-4">@Model.CompletedCount @(Model.CompletedCount == 1 ? "klar lektion" : "klara lektioner")</p>
+    <div class="row g-4">
+    @foreach (var lesson in Model.Lessons)
+    {
+        <div class="col-md-6"><article class="learning-card h-100">
+            <p class="small text-muted">@lesson.CourseTitle</p>
+            <h2 class="h4">@lesson.LessonTitle</h2>
+            <p>Bästa resultat: <strong>@lesson.BestScore av @lesson.QuestionCount rätt</strong></p>
+            <p class="@(lesson.IsCompleted ? "progress-completed" : "text-muted")">@(lesson.IsCompleted ? "Klar" : "Övar")</p>
+            @if (lesson.PendingReviewCount > 0)
+            {
+                <p>@lesson.PendingReviewCount @(lesson.PendingReviewCount == 1 ? "fråga" : "frågor") att repetera</p>
+                <a class="btn btn-outline-primary mb-2" asp-controller="Quiz" asp-action="Review" asp-route-id="@lesson.LessonId">Öva på mina fel<span class="visually-hidden"> i @lesson.LessonTitle</span></a>
+            }
+            <a class="btn btn-primary" asp-controller="Quiz" asp-action="Index" asp-route-id="@lesson.LessonId">Öva igen<span class="visually-hidden"> på @lesson.LessonTitle</span></a>
+        </article></div>
+    }
+    </div>
+}
+<a class="btn btn-outline-primary mt-4" asp-controller="Courses" asp-action="Index">Utforska kurser</a>

@@ -1,0 +1,92 @@
+@model QuizResultViewModel
+@{ ViewData["Title"] = "Resultat – " + Model.LessonTitle; }
+<header class="learning-header">
+    <p class="learning-eyebrow">@Model.LessonTitle</p>
+    <h1>@(Model.IsReview ? "Din repetitionsövning" : Model.AttemptScore.HasValue ? "Ditt lektionsresultat" : "Ditt sparade resultat")</h1>
+</header>
+
+@if (!Model.IsReview)
+{
+    <section class="xp-celebration" aria-labelledby="xp-title" data-total-xp="@Model.TotalXp" data-earned-xp="@Model.EarnedXp">
+        <div class="xp-star" aria-hidden="true">✦</div>
+        <div class="xp-summary">
+            <p class="learning-eyebrow mb-1">Din utveckling</p>
+            <h2 id="xp-title" class="xp-earned">@(Model.AttemptScore.HasValue ? $"+{Model.EarnedXp} XP" : $"{Model.TotalXp} XP totalt")</h2>
+            <p>@(Model.AttemptScore.HasValue && Model.EarnedXp == 0 ? "Du har redan tjänat XP för det här resultatet. Fortsätt öva eller prova nästa lektion!" : "Varje nytt framsteg bygger vidare på det du kan.")</p>
+            <div class="xp-level-label"><strong>Nivå @Model.Level</strong><span>@Model.TotalXp XP totalt</span></div>
+            <progress class="xp-track" value="@Model.LevelProgress" max="@LearningRewards.XpPerLevel" aria-label="XP mot nästa nivå">@Model.LevelProgress</progress>
+            <p class="small mb-0">@(LearningRewards.XpPerLevel - Model.LevelProgress) XP till nivå @(Model.Level + 1)</p>
+        </div>
+    </section>
+}
+<section class="learning-card mb-4">
+    @if (Model.AttemptScore.HasValue)
+    {
+        <p class="quiz-score">@Model.AttemptScore av @Model.QuestionCount rätt</p>
+    }
+    @if (Model.IsReview)
+    {
+        <p class="@(Model.PendingReviewCount == 0 ? "progress-completed" : "text-muted")">@(Model.PendingReviewCount == 0 ? "Inga repetitionsord kvar i den här lektionen!" : $"{Model.PendingReviewCount} {(Model.PendingReviewCount == 1 ? "fråga" : "frågor")} kvar att öva på.")</p>
+        <p class="mb-0">Ditt bästa resultat på hela lektionen är oförändrat. Gör hela quizet för att klara lektionen.</p>
+    }
+    else
+    {
+        <p class="mb-2">Bästa resultat: <strong>@Model.BestScore av @Model.QuestionCount rätt</strong></p>
+        @if (Model.IsCompleted)
+        {
+            <p class="progress-completed mb-0">Lektionen är klar! Du har fått alla rätt i ett försök.</p>
+        }
+        else
+        {
+            <p class="text-muted mb-0">Bra övat! Repetera ordkorten och försök igen. Alla rätt gör lektionen klar.</p>
+        }
+    }
+</section>
+@if (Model.PendingReviewCount > 0)
+{
+    
+<section class="learning-card mb-4">
+        <h2 class="h4">Öva på det som var svårt</h2>
+        <p>@Model.PendingReviewCount @(Model.PendingReviewCount == 1 ? "fråga väntar" : "frågor väntar") på repetition. Orden finns kvar här även om du loggar ut.</p>
+        <a class="btn btn-primary" asp-action="Review" asp-route-id="@Model.LessonId">Öva på mina fel</a>
+    </section>
+}
+<partial name="_TensePracticeNext" model="Model.TensePractice" />
+@if (!Model.IsReview && Model.IsCompleted)
+{
+    <section class="learning-card mb-4" aria-labelledby="next-step-title">
+        <h2 id="next-step-title" class="h4">Ditt nästa steg</h2>
+        @if (Model.NextLesson is { } next)
+        {
+            <p>Fortsätt öva med nästa återstående lektion i kursen.</p>
+            <a class="btn btn-primary" asp-controller="Lessons" asp-action="Details" asp-route-id="@next.Id">Fortsätt med: @next.Title</a>
+        }
+        else
+        {
+            <p class="progress-completed">Alla tillgängliga lektioner i kursen är klara! Repetera gärna för att hålla orden levande.</p>
+        }
+        <a class="btn btn-outline-primary" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId">Visa kursen</a>
+    </section>
+}
+@if (Model.Answers.Count > 0)
+{
+    <h2 class="h4">Gå igenom dina svar</h2>
+    <div class="row g-3 mb-4">
+    @foreach (var answer in Model.Answers)
+    {
+        <div class="col-sm-6"><article class="learning-card h-100">
+            <h3 class="h5" lang="ti-Latn">@answer.LatinText</h3>
+                @if (answer.TenseHint is { } timeHint) { <partial name="_TenseHint" model="timeHint" /> }
+            <partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(answer.LatinText, answer.Audience, true))" />
+            <p class="@(answer.IsCorrect ? "progress-completed" : "text-danger")">@(answer.IsCorrect ? "Rätt svar" : "Inte riktigt rätt")</p>
+            <p class="mb-1">Ditt svar: @answer.SelectedAnswer</p>
+            <p class="mb-0">Rätt @(answer.IsLatinAnswer ? "svar" : "betydelse"): <strong lang="@(answer.IsLatinAnswer ? "ti-Latn" : "sv")">@answer.CorrectAnswer</strong></p>
+        </article></div>
+    }
+    </div>
+}
+<div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-primary" asp-action="Index" asp-route-id="@Model.LessonId">@(Model.IsReview ? "Gör hela quizet" : "Gör lektionen igen")</a>
+    <a class="btn btn-outline-primary" asp-controller="Learn" asp-action="Index">Min lärväg</a>
+    <a class="btn btn-outline-primary" asp-controller="Progress" asp-action="Index">Mina framsteg</a>
+</div>

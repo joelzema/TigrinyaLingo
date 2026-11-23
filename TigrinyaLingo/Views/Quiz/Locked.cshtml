@@ -1,0 +1,7 @@
+@model LockedLessonViewModel
+@{ ViewData["Title"] = "Grunderna först"; }
+<section class="learning-card my-4" aria-labelledby="locked-title">
+<p class="learning-eyebrow">Ett steg i taget</p><h1 id="locked-title">Gör klart grunderna först</h1>
+<p>Quizet för <strong>@Model.LessonTitle</strong> är inte upplåst ännu. Gör klart <strong>@Model.RequiredLessonTitle</strong> med alla rätt för att fortsätta i kursordningen.</p><p>Du får försöka hur många gånger du vill. Tidigare klarade lektioner är alltid öppna.</p>
+<div class="d-flex gap-2 flex-wrap"><a class="btn btn-primary" asp-controller="Lessons" asp-action="Details" asp-route-id="@Model.RequiredLessonId">Fortsätt med @Model.RequiredLessonTitle</a><a class="btn btn-outline-primary" asp-controller="Lessons" asp-action="Details" asp-route-id="@ViewContext.RouteData.Values["id"]">Läs ordkorten</a><a class="btn btn-outline-primary" asp-controller="Learn" asp-action="Index">Visa min lärväg</a></div>
+</section>

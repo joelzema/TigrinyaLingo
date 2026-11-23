@@ -1,0 +1,32 @@
+@model AddressPracticeHomeViewModel
+@{ ViewData["Title"] = "Träna tilltal"; }
+@section Styles { <link rel="stylesheet" href="~/css/conversations.css" asp-append-version="true" /> }
+<div class="conversation-shell">
+    <a class="conversation-back" asp-controller="Games" asp-action="Index">← Alla spel</a>
+    <header class="conversation-header">
+        <p class="learning-eyebrow">Vem pratar du med?</p>
+        <h1>Välj rätt tilltal</h1>
+        <p>Träna på att välja en form till en man eller kvinna i korta vardagssituationer.</p>
+    </header>
+    <partial name="_AudienceExplanation" />
+    @if (Model.Message is not null) { <p class="alert alert-info" role="status">@Model.Message</p> }
+    @if (Model.PairCount > 0)
+    {
+        <section class="conversation-scene scene-ready" aria-labelledby="address-ready">
+            <p class="learning-eyebrow">Redo att öva · @Model.PairCount fraspar</p>
+            <h2 id="address-ready">Samma betydelse, olika tilltal</h2>
+            <p>Varje omgång har @(Math.Min(3, Model.PairCount) * 2) situationer och fyra svarsalternativ per fråga. Du får träna varje fraspar till både en man och en kvinna.</p>
+            <p>Välj själv först. Efter svaret får du en förklaring och kan jämföra båda formerna. Uttryck som varit svåra prioriteras i nya omgångar.</p>
+            <a class="btn btn-primary" asp-action="Play">Starta tilltalsträningen</a>
+        </section>
+    }
+    else
+    {
+        <section class="conversation-scene scene-locked" aria-labelledby="address-start">
+            <h2 id="address-start">Lär dig de första frasparen</h2>
+            <p>Gör klart en lektion med tilltalsformer, till exempel Presentera dig. Träningen bygger på fraspar från lektioner du har klarat.</p>
+            <a class="btn btn-primary" asp-controller="Learn" asp-action="Index">Fortsätt med mina lektioner</a>
+        </section>
+    }
+    <p class="conversation-note">Du tränar granskade fraspar från dina klara lektioner. Fler blir tillgängliga när du går vidare. När en omgång avslutas sparas vilka uttryck du behöver repetera. Träningspoängen gäller omgången.</p>
+</div>

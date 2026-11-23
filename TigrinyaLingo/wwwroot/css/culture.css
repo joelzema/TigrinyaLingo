@@ -1,0 +1,72 @@
+/* Diskret kulturtema. Funktionernas gröna/röda återkoppling behåller sina färger. */
+:root {
+    --culture-paper: #faf8f2;
+    --culture-ink: #263f33;
+    --culture-clay: #8b644a;
+    --culture-gold: #bd965f;
+    --culture-line: #e5dfd2;
+}
+body { background: var(--culture-paper); color: var(--culture-ink); isolation: isolate; }
+.culture-backdrop { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.culture-backdrop::before {
+    content: ""; position: absolute; left: 1.2vw; bottom: 9vh; width: 142px; height: 170px;
+    background: url('../images/jebena.svg') center / contain no-repeat; opacity: .055; transform: rotate(-9deg);
+}
+.culture-backdrop::after {
+    content: ""; position: absolute; right: 1vw; top: 28vh; width: 72px; height: 290px;
+    background: url('../images/woven-border.svg') center / 72px 36px repeat-y; opacity: .12;
+}
+.culture-header { position: relative; }
+.culture-header::before {
+    content: ""; display: block; height: 3px;
+    background: linear-gradient(90deg, #a77858, #c6a269 38%, #84927b 72%, #c6a269);
+    opacity: .65;
+}
+a.culture-brand { display: inline-flex; align-items: center; gap: .6rem; color: #294735; }
+.culture-brand img { flex-shrink: 0; object-fit: contain; }
+.culture-brand span { white-space: nowrap; word-break: normal; }
+.culture-header .navbar { background: #fffefa !important; border-bottom-color: var(--culture-line) !important; box-shadow: 0 3px 14px #6c4f2a05; }
+.culture-hero {
+    position: relative; overflow: hidden; isolation: isolate;
+    background: linear-gradient(120deg, #f5eedf, #f9f6ed 55%, #edf3e8);
+    border-color: #e5dbc8;
+}
+.culture-hero::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 10px;
+    background: url('../images/woven-border.svg') center / 64px 32px repeat-x; opacity: .4;
+    pointer-events: none;
+}
+.hero-copy { position: relative; z-index: 1; max-width: 43rem; }
+.culture-kicker { color: var(--culture-clay); font-size: .78rem; font-weight: 650; letter-spacing: .04em; margin: 0 0 1.25rem; }
+.hero-jebena { position: absolute; width: 190px; height: auto; right: 3rem; top: 50%; transform: translateY(-50%) rotate(8deg); opacity: .14; pointer-events: none; }
+.culture-hero .learning-eyebrow { margin-bottom: .7rem; }
+.learning-card, .learning-empty { border-color: var(--culture-line); }
+.lesson-row.lesson-recommended { border-color: #567d55; }
+.course-overview { background: #f2f3e9; }
+.learning-tag { background: #f0eadb; color: #765b3d; }
+.lesson-number { background: #f2ecdf; color: #726046; }
+.quiz-stage { background: #fffefa; border-color: var(--culture-line); }
+.quiz-exit { background: #fffefa; border-color: var(--culture-line); }
+.quiz-mode-tag { background: #f1eadf; color: #7a5b41; }
+.quiz-stage-kind { color: #83684c; }
+.quiz-sound-orb { color: #8b644a; background: #f6eddd; box-shadow: 0 5px 0 #e8dac1; }
+.quiz-controls { background: #fffefa; border-color: var(--culture-line); }
+.xp-celebration { background: linear-gradient(125deg, #f8f0dd, #eef5e9); border-color: #e4dbc5; }
+.xp-star { background: #f3d58c; box-shadow: 0 7px 0 #d8b769; }
+.culture-footer { background: #fffefa; border-color: var(--culture-line) !important; }
+.culture-footer::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -4px; height: 7px;
+    background: url('../images/woven-border.svg') center / 48px 24px repeat-x; opacity: .22;
+    pointer-events: none;
+}
+@media (max-width: 1199.98px) { .hero-jebena { width: 150px; right: 1.5rem; opacity: .075; } }
+@media (max-width: 991.98px) { .culture-backdrop { display: none; } .hero-jebena { width: 115px; right: 1rem; top: 3.5rem; opacity: .065; } }
+@media (max-width: 575.98px) {
+    .culture-brand img { width: 22px; height: 28px; }
+    .culture-kicker { max-width: 15rem; font-size: .72rem; }
+    .hero-jebena { width: 88px; right: .8rem; top: 2.75rem; opacity: .055; }
+    .culture-hero::after { height: 7px; opacity: .3; }
+}
+@media (forced-colors: active) {
+    .culture-backdrop, .hero-jebena, .culture-header::before, .culture-hero::after, .culture-footer::before { display: none; }
+}

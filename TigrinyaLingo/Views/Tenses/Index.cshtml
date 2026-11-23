@@ -1,0 +1,29 @@
+@model TenseHomeViewModel
+@{ ViewData["Title"] = "Nutid, dåtid och framtid"; }
+@section Styles { <link rel="stylesheet" href="~/css/tenses.css" asp-append-version="true" /> }
+<div class="tense-shell">
+    <header class="learning-header"><p class="learning-eyebrow">Sätt orden i tid</p><h1>Nu, tidigare eller senare?</h1><p>Här jämför du hur man uttrycker nutid, dåtid och framtid i tydliga vardagssituationer.</p></header>
+    <div class="tense-timeline" aria-label="Tre sätt att placera något i tid">
+        <article><span>Tidigare</span><h2>Dåtid</h2><p>Något hände före nu.</p><p class="tense-example">Svenskt exempel: Jag åt.</p></article>
+        <article><span>Nu eller återkommande</span><h2>Nutid</h2><p>Något händer nu eller brukar hända.</p><p class="tense-example">Svenskt exempel: Jag äter.</p></article>
+        <article><span>Senare</span><h2>Framtid</h2><p>Något ska hända efter nu.</p><p class="tense-example">Svenskt exempel: Jag ska äta.</p></article>
+    </div>
+    <p class="tense-note">Exemplen ovan är svenskt lässtöd. Tigrinjans former behöver läras tillsammans med sitt sammanhang. Samma svenska tidsform har inte alltid en enda motsvarighet på tigrinja.</p>
+    @if (Model.Message is not null) { <p class="alert alert-info" role="status">@Model.Message</p> }
+    @if (Model.Groups.Count == 0)
+    {
+        <section class="learning-card"><h2 class="h4">Tigrinjaexemplen förbereds</h2><p>Här kommer granskade verbgrupper med jämförelsekort och övningar. Under tiden kan du fortsätta med vardagsfraserna och tilltalsträningen.</p><a class="btn btn-primary" asp-controller="Courses" asp-action="Index">Fortsätt med lektionerna</a></section>
+    }
+    else
+    {
+        <h2 class="h3 mt-4">Jämför verbformer</h2>
+        <p class="tense-note">Börja med jag-formerna. Nutidsexemplen här beskriver något som pågår just nu. Formerna är kontrollerade mot språkunderlag; lärargranskning och egna ljudinspelningar återstår. Den latinska stavningen är ett lässtöd och kan variera.</p>
+        <div class="tense-groups">@foreach (var group in Model.Groups) { <article class="learning-card"><p class="learning-eyebrow">Tre granskade former</p><h3>@group.Title</h3><p>Jämför uttrycken eller skriv tre egna svar med kursens fraser.</p><a class="btn btn-primary" asp-action="Details" asp-route-id="@group.Id">Jämför formerna<span class="visually-hidden">: @group.Title</span></a> <a class="btn btn-outline-primary" asp-action="Write" asp-route-id="@group.Id">Skriv i tre tidsformer<span class="visually-hidden">: @group.Title</span></a></article> }</div>
+    }
+    @if (Model.CanEdit)
+    {
+        <section class="learning-card mt-4"><p class="learning-eyebrow">Din lokala innehållsverkstad</p><h2 class="h4">Förbered en verbgrupp</h2><p>Lägg varje form som en egen fras och fyll i Tidsformer i redigeraren. Använd samma gruppnamn för samma verb och person. Markera språkgranskning när former och sammanhang har kontrollerats.</p><a class="btn btn-outline-primary" asp-controller="PhraseCreation" asp-action="Index">Lägg till en fras</a> <a class="btn btn-outline-primary" asp-controller="ContentEditor" asp-action="Index">Redigera fraser</a>
+        @foreach (var draft in Model.Drafts) { <div class="tense-draft mt-3"><h3 class="h5">@draft.Title · behöver granskas</h3><ul>@foreach (var issue in draft.Issues) { <li>@issue</li> }</ul>@foreach (var word in draft.Words) { <a class="d-block" asp-controller="ContentEditor" asp-action="Edit" asp-route-id="@word.Id">Redigera @word.LatinText</a> }</div> }
+        </section>
+    }
+</div>

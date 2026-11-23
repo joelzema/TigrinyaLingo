@@ -1,0 +1,22 @@
+@model TenseGroupViewModel
+@{ ViewData["Title"] = Model.Title + " – tidsformer"; }
+@section Styles { <link rel="stylesheet" href="~/css/tenses.css" asp-append-version="true" /> }
+<div class="tense-shell">
+    <a class="conversation-back" asp-action="Index">← Alla tidsformer</a>
+    <header class="learning-header"><p class="learning-eyebrow">Jämför och använd</p><h1>@Model.Title</h1><p>Läs situationen och jämför formerna. Lägg märke till vad som händer nu, vad som hände tidigare och vad som ska hända senare.</p></header>
+    <p class="tense-note">Latinsk stavning är ett praktiskt lässtöd. Startinnehållet är källkontrollerat; det har ännu inte granskats av vår egen tigrinjalärare.</p>
+    <div class="tense-comparison">
+    @foreach (var word in Model.Words)
+    {
+        <article class="learning-card"><p class="learning-eyebrow">@word.Hint?.Label</p><h2 class="h4">@word.Meaning</h2><p class="spoken-word" lang="ti-Latn">@word.LatinText</p><partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(word.LatinText, word.Audience))" />
+        @if (word.Hint is { } hint) { <partial name="_TenseHint" model="hint" /> }
+        <a class="small d-block mt-3" asp-controller="Lessons" asp-action="Details" asp-route-id="@word.LessonId">Lektion: @word.LessonTitle</a></article>
+    }
+    </div>
+    <section class="learning-card mt-4"><h2 class="h4">Välj rätt form i en situation</h2>
+    @if (User.Identity?.IsAuthenticated != true) { <p>Logga in för att träna och spara repetitionen.</p><a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Details", new { id = Model.Id })">Logga in</a> }
+    else if (!Model.LessonsCompleted) { <p>Gör först klart lektionerna som hör till formerna ovan. Jämförelsekorten kan du läsa redan nu.</p><a class="btn btn-primary" asp-controller="Learn" asp-action="Index">Till min lärväg</a> }
+    else if (!Model.CanPractice) { <p>Träningen behöver också några andra kända uttryck för att ge fyra tydliga svarsalternativ.</p><a class="btn btn-primary" asp-controller="Learn" asp-action="Index">Fortsätt med mina lektioner</a> }
+    else { <p>Tre situationer, fyra alternativ och en förklaring efter varje svar. Missade former följer med till repetitionen.</p><a class="btn btn-primary" asp-action="Play" asp-route-id="@Model.Id">Träna tidsformer</a> }
+    </section>
+</div>

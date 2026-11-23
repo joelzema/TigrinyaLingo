@@ -1,0 +1,45 @@
+@model PlacementPracticePage
+@{
+    ViewData["Title"] = "Träna på " + Model.Card.Area.ToLowerInvariant();
+}
+<div class="preference-shell placement-shell">
+    <header class="learning-header">
+        <p class="learning-eyebrow">Frivillig övning · @Model.Card.Area</p>
+        <h1 class="h3">@Model.Card.Prompt</h1>
+        <p>Fråga @Model.Step av @Model.Total</p>
+    </header>
+    <section class="learning-card">
+        @if (!Model.Choice.HasValue)
+        {
+            <form asp-action="Practice" method="get">
+                <input type="hidden" name="token" value="@Model.Token" />
+                <input type="hidden" name="area" value="@Model.Card.Area" />
+                <input type="hidden" name="step" value="@Model.Step" />
+                <fieldset><legend class="h5">Välj uttryck</legend>
+                    @foreach (var option in Model.Card.Choices)
+                    {
+                        <label class="placement-option"><input type="radio" name="choice" value="@option.Key" required /> <span>@option.Text</span></label>
+                    }
+                </fieldset>
+                <button class="btn btn-primary mt-3" type="submit">Kolla svaret</button>
+            </form>
+        }
+        else
+        {
+            var selected = Model.Card.Choices.Single(c => c.Key == Model.Choice);
+            var correct = Model.Card.Choices.Single(c => c.Key == Model.Card.CorrectKey);
+            <h2 class="h4">@(selected == correct ? "Rätt!" : "Här passar ett annat uttryck")</h2>
+            @if (selected != correct) { <p>Du valde <strong>@selected.Text</strong>.</p> }
+            <p>@Model.Card.Explanation</p>
+            @if (Model.Step < Model.Total)
+            {
+                <a class="btn btn-primary" asp-action="Practice" asp-route-token="@Model.Token" asp-route-area="@Model.Card.Area" asp-route-step="@(Model.Step + 1)">Nästa situation</a>
+            }
+            else
+            {
+                <p><strong>Övningen är klar!</strong></p>
+            }
+        }
+    </section>
+    <a class="d-inline-block mt-3" asp-action="Result" asp-route-token="@Model.Token">Tillbaka till mitt nivåresultat</a>
+</div>

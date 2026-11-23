@@ -1,0 +1,87 @@
+@model PhraseCreateViewModel
+@{ ViewData["Title"] = "Lägg till fras"; }
+<div class="quiz-shell">
+    <nav aria-label="Brödsmulor"><ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="ContentEditor" asp-action="Index">Ord och fraser</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Lägg till fras</li>
+    </ol></nav>
+    <header class="learning-header">
+        <p class="learning-eyebrow">Bygg vidare på lärandet</p>
+        <h1>Lägg till ett ord eller en fras</h1>
+        <p class="text-muted">Fyll i uttrycket och fyra svenska svarsalternativ. När du sparar kan frasen användas direkt i lektionens träning.</p>
+    </header>
+    @if (Model.PlacementMessage is not null) { <p class="alert alert-info" role="status">@Model.PlacementMessage</p> }
+    <form method="post" asp-action="Index" class="learning-card" data-create-phrase>
+        <input asp-for="CreationToken" type="hidden" />
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        <fieldset class="mb-4">
+            <legend class="h5">Var ska frasen ligga?</legend>
+            <label asp-for="LessonId" class="form-label"></label>
+            <select asp-for="LessonId" class="form-select" data-lesson-destination aria-describedby="lesson-destination-help">
+                <option value="0">Skapa en ny lektion</option>
+                @foreach (var lesson in Model.Lessons)
+                {
+                    <option value="@lesson.Id" disabled="@lesson.HasResults">@lesson.Title @(lesson.HasResults ? "– har sparade resultat" : "")</option>
+                }
+            </select>
+            <span asp-validation-for="LessonId" class="text-danger"></span>
+            <p id="lesson-destination-help" class="form-text">Du kan fylla på en lektion innan någon har sparat ett resultat. Välj en ny lektion om den befintliga redan har använts.</p>
+            <div class="mt-3" data-new-lesson>
+                <div class="mb-3">
+                    <label asp-for="NewLessonTitle" class="form-label"></label>
+                    <input asp-for="NewLessonTitle" maxlength="120" class="form-control" placeholder="Till exempel Fler vardagsfraser" />
+                    <span asp-validation-for="NewLessonTitle" class="text-danger"></span>
+                </div>
+                <label asp-for="CourseId" class="form-label"></label>
+                <select asp-for="CourseId" class="form-select">
+                    @foreach (var course in Model.Courses) { <option value="@course.Id">@course.Title</option> }
+                </select>
+                <span asp-validation-for="CourseId" class="text-danger"></span>
+                <p class="form-text mb-0">Fyll i namn och kurs när du väljer Skapa en ny lektion.</p>
+            </div>
+        </fieldset>
+        <div class="mb-4">
+            <label asp-for="LatinText" class="form-label fw-semibold"></label>
+            <input asp-for="LatinText" maxlength="200" class="form-control form-control-lg" lang="ti-Latn" />
+            <span asp-validation-for="LatinText" class="text-danger"></span>
+            <p class="form-text">Skriv tigrinjan med latinska bokstäver.</p>
+        </div>
+        <partial name="_AudienceField" model="Model.Audience" />
+        <partial name="_TenseFields" model="Model" />
+        <partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(Model.LatinText, Model.Audience, true))" />
+        <fieldset class="mb-4">
+            <legend class="h5">Svenska svarsalternativ</legend>
+            <p class="small text-muted">Markera rätt svar. Det blir också den svenska betydelsen på lärkortet.</p>
+            @for (var index = 0; index < Model.Choices.Count; index++)
+            {
+                <div class="editor-choice mb-3">
+                    <div class="form-check mb-2">
+                        <input type="radio" class="form-check-input" id="new-correct-@index" name="CorrectChoiceIndex" value="@index" checked="@(Model.CorrectChoiceIndex == index)" required />
+                        <label for="new-correct-@index" class="form-check-label">Alternativ @(index + 1) är rätt svar</label>
+                    </div>
+                    <label asp-for="Choices[index].Text" class="visually-hidden">Svenskt svar @(index + 1)</label>
+                    <input asp-for="Choices[index].Text" class="form-control" maxlength="200" />
+                    <span asp-validation-for="Choices[index].Text" class="text-danger"></span>
+                </div>
+            }
+            <span asp-validation-for="CorrectChoiceIndex" class="text-danger"></span>
+        </fieldset>
+        <div class="mb-4">
+            <label asp-for="AudioFileName" class="form-label fw-semibold"></label>
+            <select asp-for="AudioFileName" class="form-select">
+                <option value="">Ingen inspelning</option>
+                @foreach (var file in Model.AudioFiles) { <option value="@file">@file</option> }
+            </select>
+            <span asp-validation-for="AudioFileName" class="text-danger"></span>
+            <p class="form-text">Välj bara en inspelning som säger den nya frasen. Utan ljud får frasen läs- och översättningsövningar.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-3">
+            <button type="submit" class="btn btn-primary btn-lg">Spara ny fras</button>
+            <a class="btn btn-outline-primary" asp-controller="ContentEditor" asp-action="Index">Avbryt</a>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/phrase-create.js" asp-append-version="true" defer></script>
+}

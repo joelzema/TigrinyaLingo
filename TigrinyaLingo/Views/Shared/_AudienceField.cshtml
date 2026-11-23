@@ -1,0 +1,13 @@
+@model Domain.Entities.PhraseAudience
+<div class="mb-4">
+    <label class="form-label fw-semibold" for="Audience">Vem säger man frasen till?</label>
+    <select class="form-select" id="Audience" name="Audience" aria-describedby="audience-help">
+        <option value="0" selected="@(Model == Domain.Entities.PhraseAudience.Automatic)">Automatiskt för kända fraser</option>
+        <option value="1" selected="@(Model == Domain.Entities.PhraseAudience.Man)">(m) Till en man</option>
+        <option value="2" selected="@(Model == Domain.Entities.PhraseAudience.Woman)">(f) Till en kvinna</option>
+        <option value="3" selected="@(Model == Domain.Entities.PhraseAudience.SeveralOrPolite)">Till flera / artigt tilltal</option>
+        <option value="4" selected="@(Model == Domain.Entities.PhraseAudience.SameForBoth)">Samma form till man och kvinna</option>
+    </select>
+    <p id="audience-help" class="form-text">Välj vem du talar till, inte vem som säger frasen. För egna eller ändrade uttryck: kontrollera formen med en tigrinjatalare och välj rätt tilltal. Automatiskt känner bara igen granskade fraser; okända uttryck får ingen markering. Svenska betydelser behöver inga (m)/(f)-tillägg.</p>
+    @Html.ValidationMessage("Audience", null, new { @class = "text-danger" })
+</div>

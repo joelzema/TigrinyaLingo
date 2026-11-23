@@ -1,0 +1,51 @@
+@model DailyTrainingResultViewModel
+@{ ViewData["Title"] = "Dagens träning – resultat"; }
+<div class="quiz-shell">
+    <header class="learning-header">
+        <p class="learning-eyebrow">Dagens träning</p>
+        <h1>@(Model.Answers.Count > 0 ? "Bra jobbat med repetitionen!" : "Dina sparade repetitionsord")</h1>
+    </header>
+    @if (Model.Answers.Count > 0)
+    {
+        <section class="learning-card mb-4" aria-labelledby="daily-score">
+            <h2 class="quiz-score" id="daily-score">@Model.CorrectCount av @Model.Answers.Count rätt</h2>
+            <p>@(Model.CorrectCount == Model.Answers.Count ? "Du mindes alla uttryck i den här omgången. Fortsätt repetera en annan dag." : "Uttrycken nedan är bra att återkomma till. De finns nu i din repetitionslista.")</p>
+            <p class="small text-muted mb-0">Träningen är sparad. Dina bästa lektionsresultat och XP är oförändrade.</p>
+        </section>
+        @if (Model.Answers.Any(answer => !answer.IsCorrect))
+        {
+            <h2 class="h4">Det här behöver du öva mer på</h2>
+            @foreach (var answer in Model.Answers.Where(answer => !answer.IsCorrect))
+            {
+                <article class="learning-card mb-3">
+                    <p class="small text-muted">@answer.LessonTitle</p>
+                    <h3 class="h4" lang="ti-Latn">@answer.LatinText</h3>
+                @if (answer.TenseHint is { } timeHint) { <partial name="_TenseHint" model="timeHint" /> }
+                    <partial name="_PhraseUsage" model="@(new PhraseUsageDisplay(answer.LatinText, answer.Audience, true))" />
+                    <p>Betydelse: @answer.Meaning</p>
+                    <p>Ditt svar: @answer.SelectedAnswer</p>
+                    <p>Rätt svar: <strong>@answer.CorrectAnswer</strong></p>
+                    <a class="btn btn-outline-primary" asp-controller="Quiz" asp-action="Review" asp-route-id="@answer.LessonId">Öva på mina fel<span class="visually-hidden"> i @answer.LessonTitle</span></a>
+                </article>
+            }
+        }
+        <details class="learning-card mb-4">
+            <summary>Alla uttryck i den här träningen</summary>
+            <ul class="mt-3 mb-0">
+            @foreach (var answer in Model.Answers)
+            {
+                <li><span lang="ti-Latn">@answer.LatinText</span> · @answer.Meaning <span>@PhraseUsageGuide.For(answer.LatinText, answer.Audience)?.Label</span> · @(answer.IsCorrect ? "Rätt" : "Öva mer")</li>
+            }
+            </ul>
+        </details>
+    }
+    else
+    {
+        <p>Omgångens detaljer visas en gång. Dina senaste svar finns kvar under Mina framsteg.</p>
+    }
+    <p>@Model.PendingCount uttryck väntar på repetition totalt.</p>
+    <div class="d-flex flex-wrap gap-3">
+        <a class="btn btn-primary" asp-action="Index">Träna igen</a>
+        <a class="btn btn-outline-primary" asp-controller="Progress" asp-action="Index">Mina framsteg</a>
+    </div>
+</div>

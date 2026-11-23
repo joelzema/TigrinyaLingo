@@ -1,0 +1,71 @@
+@model CourseDetailsViewModel
+@{ ViewData["Title"] = Model.Title; }
+
+<nav aria-label="Brödsmulor"><ol class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-action="Index">Kurser</a></li>
+    <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+</ol></nav>
+<header class="learning-header">
+    <p class="learning-eyebrow">Din väg genom kursen</p>
+    <h1>@Model.Title</h1><p class="text-muted">@Model.Description</p>
+</header>
+@if (Model.Lessons.Count == 0)
+{
+    <div class="learning-empty"><h2 class="h4">Lektioner kommer snart</h2><p>Den här kursen har inga lektioner ännu.</p></div>
+}
+else
+{
+    @if (Model.AvailableCount > 0)
+    {
+        <section class="learning-card course-overview mb-4" aria-labelledby="course-overview-title">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <h2 id="course-overview-title" class="h4">Dina framsteg i kursen</h2><p>Alla färdiga lektionsquiz är öppna. Välj själv eller följ rekommendationen. Alla rätt markerar lektionen som klar.</p>
+                <label for="course-progress">@Model.CompletedCount av @Model.AvailableCount lektioner klara</label>
+                <progress id="course-progress" class="course-progress" value="@Model.CompletedCount" max="@Model.AvailableCount">@Model.CompletedCount av @Model.AvailableCount</progress>
+                @if (Model.NextLesson is null)
+                {
+                    <p class="progress-completed mb-0">Alla tillgängliga lektioner är klara! Du kan repetera dem när du vill.</p>
+                }
+            }
+            else
+            {
+                <h2 id="course-overview-title" class="h4">Börja din språkresa</h2>
+                <p>Läs ordkorten i din egen takt och följ lektionerna i ordning. Logga in när du vill göra quiz och spara framstegen.</p>
+            }
+            @if (Model.NextLesson is { } next)
+            {
+                <a class="btn btn-primary mt-3" asp-controller="Lessons" asp-action="Details" asp-route-id="@next.Id">@(User.Identity?.IsAuthenticated == true ? "Fortsätt med" : "Börja med"): @next.Title</a>
+            }
+        </section>
+    }
+    <ol class="lesson-list">
+    @foreach (var lesson in Model.Lessons)
+    {
+        <li class="learning-card lesson-row @(Model.NextLesson?.Id == lesson.Id ? "lesson-recommended" : "")">
+            <span class="lesson-number" aria-hidden="true">@lesson.Order</span>
+            <div class="flex-grow-1">
+                <h2 class="h5 mb-1">@lesson.Title</h2>
+                <p class="text-muted mb-0">@lesson.WordCount ord och uttryck</p>
+                @if (!lesson.IsReady)
+                {
+                    <p class="small text-muted mb-0">Innehåll kommer snart</p>
+                }
+                else if (lesson.IsLocked)
+                {
+                    <p class="small text-muted mb-0">Quizet är låst. Gör klart @lesson.RequiredLessonTitle först. Ordkorten går att läsa redan nu.</p>
+                }
+                else if (Model.NextLesson?.Id == lesson.Id)
+                {
+                    <p class="small progress-completed mb-0">@(User.Identity?.IsAuthenticated == true ? "Nästa steg för dig" : "Börja här")</p>
+                }
+                @if (lesson.BestScore.HasValue)
+                {
+                    <p class="small mb-0 @(lesson.IsCompleted ? "progress-completed" : "text-muted")">@(lesson.IsCompleted ? "Klar" : "Övar") · Bästa resultat: @lesson.BestScore av @lesson.WordCount rätt</p>
+                }
+            </div>
+            <a class="btn @(lesson.IsLocked ? "btn-outline-primary" : "btn-primary")" asp-controller="Lessons" asp-action="Details" asp-route-id="@lesson.Id">@(lesson.IsLocked ? "Läs ordkorten" : "Öppna lektionen")<span class="visually-hidden"> @lesson.Title</span></a>
+        </li>
+    }
+    </ol>
+}

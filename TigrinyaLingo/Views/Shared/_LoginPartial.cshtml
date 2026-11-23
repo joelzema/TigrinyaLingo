@@ -1,0 +1,27 @@
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService ContentAuthorization
+<ul class="navbar-nav">
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <li class="nav-item dropdown">
+        <button id="account-menu" type="button" class="nav-link btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">@(User.FindFirst(TigrinyaLingo.Models.ProfileNameInput.ClaimType)?.Value ?? "Mitt konto")</button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="account-menu">
+            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Min profil</a></li>
+            <li><a class="dropdown-item" asp-area="" asp-controller="Progress" asp-action="Index">Mina framsteg</a></li>
+            @if ((await ContentAuthorization.AuthorizeAsync(User, Context, TigrinyaLingo.Authorization.LocalContentEditing.Policy)).Succeeded)
+            {
+                <li><a class="dropdown-item" asp-area="" asp-controller="ContentEditor" asp-action="Index">Redigera fraser</a></li>
+            }
+            <li><hr class="dropdown-divider" /></li>
+            <li><form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                <button type="submit" class="dropdown-item">Logga ut</button>
+            </form></li>
+        </ul>
+    </li>
+}
+else
+{
+    <li class="nav-item"><a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Logga in</a></li>
+    <li class="nav-item"><a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Skapa konto</a></li>
+}
+</ul>

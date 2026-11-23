@@ -1,0 +1,30 @@
+@page
+@model TigrinyaLingo.Areas.Identity.Pages.Account.RegisterModel
+@{ ViewData["Title"] = "Skapa konto"; }
+<header class="learning-header"><p class="learning-eyebrow">Ditt konto</p><h1>Skapa konto</h1><p>Med ett konto kan du göra quiz och spara dina framsteg.</p></header>
+<div class="row g-4">
+    <section class="col-lg-7">
+        <div class="learning-card">
+        @if (Model.IsLocalRegistration)
+        {
+            <p class="text-muted">Det här är utvecklingsversionen. Inget bekräftelsemejl skickas. Efter registreringen bekräftar du kontot med en knapp på nästa sida.</p>
+            <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+                <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+                <div class="mb-3"><label asp-for="Input.DisplayName" class="form-label"></label><input asp-for="Input.DisplayName" class="form-control" autocomplete="nickname" maxlength="30" /><span asp-validation-for="Input.DisplayName" class="text-danger"></span></div>
+                <div class="mb-3"><label asp-for="Input.Email" class="form-label"></label><input asp-for="Input.Email" class="form-control" autocomplete="username" inputmode="email" /><span asp-validation-for="Input.Email" class="text-danger"></span></div>
+                <div class="mb-3"><label asp-for="Input.Password" class="form-label"></label><input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-describedby="password-requirements" /><span asp-validation-for="Input.Password" class="text-danger"></span></div>
+                <div class="mb-3"><label asp-for="Input.ConfirmPassword" class="form-label"></label><input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" /><span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span></div>
+                <button type="submit" class="btn btn-primary">Skapa konto</button>
+            </form>
+        }
+        else
+        {
+            <p>Registrering är inte öppnad i den publicerade versionen ännu.</p>
+        }
+        <p class="mt-3 mb-0">Har du redan ett konto? <a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Logga in</a></p>
+        </div>
+    </section>
+    <aside class="col-lg-5"><div class="learning-card" id="password-requirements"><h2 class="h4">Välj ett lösenord med</h2><ul class="mb-0">@foreach (var requirement in Model.PasswordRequirements) { <li>@requirement</li> }</ul></div></aside>
+</div>
+<a class="btn btn-outline-primary mt-3" asp-area="" asp-controller="Courses" asp-action="Index">Utforska kurser utan konto</a>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

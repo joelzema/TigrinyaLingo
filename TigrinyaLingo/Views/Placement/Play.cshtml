@@ -1,0 +1,35 @@
+@model PlacementPlay
+@{ ViewData["Title"]="Nivåtest"; }
+<div class="preference-shell placement-shell">
+    <a asp-action="Index">← Om testet</a>
+    <header class="learning-header"><p class="learning-eyebrow">Hitta din startpunkt</p><h1>Vad känner du igen?</h1><p>Fyra alternativ eller hoppa över. Resultatet visas när du skickar in alla nio frågor.</p></header>
+    @if(Model.Message is not null) { <p class="alert alert-warning" role="alert">@Model.Message</p> }
+    <div class="placement-meter" data-placement-meter hidden><span data-placement-count></span><progress value="1" max="@Model.Questions.Count" aria-label="Din plats i nivåtestet"></progress></div>
+    <form asp-action="Submit" method="post" data-placement-form>
+        <input type="hidden" name="Token" value="@Model.Token" />
+        @for(var i=0;i<Model.Questions.Count;i++)
+        {
+            var question=Model.Questions[i];
+            <fieldset class="learning-card placement-question" data-placement-question>
+                <legend class="visually-hidden">Fråga @(i+1): @question.Prompt</legend>
+                <input type="hidden" name="Answers[@i].QuestionKey" value="@question.Key" />
+                <p class="learning-eyebrow">Fråga @(i+1) av @Model.Questions.Count · @question.Area</p>
+                <h2 class="h4">@question.Prompt</h2>
+                <div class="placement-options">
+                @foreach(var choice in question.Choices)
+                {
+                    <label class="placement-option"><input type="radio" required name="Answers[@i].ChoiceKey" value="@choice.Key" checked="@(question.Selected==choice.Key)" /><span>@choice.Text</span></label>
+                }
+                </div>
+                <label class="placement-option placement-skip"><input type="radio" required name="Answers[@i].ChoiceKey" value="@Guid.Empty" checked="@(question.Selected==Guid.Empty)" /><span>Jag vet inte – hoppa över frågan</span></label>
+            </fieldset>
+        }
+        <div class="placement-controls">
+            <button type="button" class="btn btn-outline-primary" data-placement-back hidden>Föregående</button>
+            <button type="button" class="btn btn-primary" data-placement-next hidden>Nästa fråga</button>
+            <button type="submit" class="btn btn-primary" data-placement-submit>Visa mitt resultat</button>
+        </div>
+        <p class="small text-muted mt-3">Testet ger inga XP. ”Jag vet inte” hjälper oss att ge ett mer användbart förslag än gissningar.</p>
+    </form>
+</div>
+@section Scripts { <script src="~/js/placement.js" asp-append-version="true"></script> }

@@ -1,0 +1,8 @@
+.tense-shell { max-width: 1120px; margin: 2rem auto 3rem; }
+.tense-timeline, .tense-comparison { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1.2rem; margin: 1.5rem 0; }
+.tense-timeline article { padding: 1.5rem; border: 1px solid #d5ddca; border-bottom: 5px solid #77975c; border-radius: 22px; background: #fffdf8; }
+.tense-timeline article:first-child { border-bottom-color: #b29b68; }.tense-timeline article:last-child { border-bottom-color: #9b89ad; }
+.tense-timeline span { color: #52634a; font-size: .85rem; }.tense-timeline h2 { margin-top: .7rem; font-weight: 800; color: #2f4b37; }
+.tense-example { padding: .75rem; background: #f0f3e9; border-radius: 10px; margin-bottom: 0; }.tense-note { max-width: 850px; line-height: 1.7; color: #52634e; }
+.tense-groups { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.2rem; }.tense-hint { margin: 1rem 0; text-align: left; line-height: 1.6; overflow-wrap: anywhere; }.tense-draft { padding-top: 1rem; border-top: 1px solid #d5ddca; }
+@media(max-width:700px) { .tense-timeline, .tense-comparison, .tense-groups { grid-template-columns: 1fr; }.tense-shell { margin-top: 1rem; } }

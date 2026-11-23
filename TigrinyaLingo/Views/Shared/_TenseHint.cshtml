@@ -1,0 +1,6 @@
+@model TenseHint
+<div class="tense-hint">
+    <span class="phrase-usage-label">@Model.Label</span>
+    <p class="mt-2 mb-1"><strong>När används formen?</strong> @Model.Context</p>
+    @if (!string.IsNullOrWhiteSpace(Model.Notes)) { <p class="small mb-0">@Model.Notes</p> }
+</div>

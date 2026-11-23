@@ -1,0 +1,16 @@
+@page
+@model TigrinyaLingo.Areas.Identity.Pages.Account.ConfirmEmailModel
+@{ ViewData["Title"] = Model.Succeeded ? "Kontot är bekräftat" : "Kontot kunde inte bekräftas"; }
+<header class="learning-header"><h1>@ViewData["Title"]</h1></header>
+<section class="learning-card">
+    @if (Model.Succeeded)
+    {
+        <p>Ditt konto är bekräftat. Logga in för att göra quiz och spara dina framsteg.</p>
+        <a class="btn btn-primary" asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Logga in och fortsätt</a>
+    }
+    else
+    {
+        <p>Länken är ogiltig eller har gått ut. Kontrollera att du öppnade hela bekräftelselänken från registreringen.</p>
+        <a class="btn btn-outline-primary" asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Till inloggningen</a>
+    }
+</section>
